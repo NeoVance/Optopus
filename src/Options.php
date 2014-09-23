@@ -262,7 +262,7 @@ class Options {
 	
 		$this->explodeShortOpts($this->selected);	
 		foreach($this->selected as $selected) {
-			if($selected === "--help" || $selected === "-h") {
+			if($selected === "--help" || $selected === "-h" || $selected === "-?") {
 				$this->help();
 				die();
 			}
