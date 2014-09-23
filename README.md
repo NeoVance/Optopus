@@ -37,6 +37,8 @@ Option Arguments can be called with the following syntaxes:
 
 `./script -b=foo`
 
+It will also allow 'clustered' short options ie: `-asdf` is equal to `-a -s -d -f`
+
 
 Currently not accepted:
 
