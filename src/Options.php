@@ -20,11 +20,11 @@ class Options {
 		],
 	];
 
-	public function __construct() {
+	public function __construct($tokens) {
 
-		$this->title = $_SERVER['argv'][0];
-		array_shift($_SERVER['argv']);
-		$this->selected = $_SERVER['argv'];
+		$this->title = $tokens[0];
+		array_shift($tokens);
+		$this->selected = $tokens;
 
 	}
 
