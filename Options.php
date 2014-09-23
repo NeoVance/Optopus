@@ -1,6 +1,6 @@
 <?php
 
-namespace Options;
+namespace Optopus;
 
 class Options {
 	
