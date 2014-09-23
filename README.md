@@ -42,8 +42,10 @@ Currently not accepted:
 
 `./script -xyzb=foo` assuming -b acceptsArgument()  This will not work as expected
 
-`./script --barFOO` no spaces -- assuming --bar acceptsArgument()  This will not work as expected
+`./script --barFOO` no spaces. assuming --bar acceptsArgument()  This will not work as expected
 
 
 I'm not sure if those bizarre end-user cases *should* be supported, but they aren't as of now.
+
+Supports "--" for end-of-options GNU pseudo-standard
 
