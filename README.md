@@ -51,3 +51,6 @@ I'm not sure if those bizarre end-user cases *should* be supported, but they are
 
 Supports "--" for end-of-options GNU pseudo-standard
 
+`--help`, `-h`, `-?` will default to a help page generated from the `description()` method of options.
+
+
