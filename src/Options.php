@@ -252,7 +252,7 @@ class Options {
 		}
 		foreach($this->_available as $option => $array) {
 			if(!isset($array['description'])) {
-				$array['description'] = $option." - No description available.";
+				$array['description'] = "No description available.";
 			}
 			printf("%-20s%s\n", $option, $array['description']);
 		}
