@@ -145,12 +145,23 @@ class Options {
 
 	private function explodeShortOpts(&$tokens) {
 
+		// this finds clustered shortopts, ie: -asdf and converts them to -a -s -d -f 
+		// But it has to also maintain the order they were supplied for consistency, and to allow the final
+		// clustered shortopt to acceptsArgument() properly, even though that's a strange end-user usage.
+
 		foreach($tokens as $key => $selected) {
 			if($this->argType($selected) === 'short' && strlen($selected) > 2 && $selected[2] !== "=") {
+
+				// unset the "-asdf"
 				unset($tokens[$key]);
+
+				// repopulate as individual options
 				$shortopts = str_split($this->strip_leading_dashes($selected));
 				array_walk($shortopts, function(&$shortopt) { $shortopt = "-".$shortopt; });
 				array_splice($tokens, $key, 0, $shortopts);
+
+				// we did array_splice, so we have to manually advance the internal array pointer by the amount of shortopts
+				// kind of a hack, but it's necessary
 				for($i=0; $i<count($shortopts); $i++) { next($tokens); }
 			}
 		}
