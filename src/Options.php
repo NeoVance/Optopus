@@ -251,6 +251,9 @@ class Options {
 			printf("\n%s\n\n", $this->title);
 		}
 		foreach($this->_available as $option => $array) {
+			if(!isset($array['description'])) {
+				$array['description'] = $option." - No description available.";
+			}
 			printf("%-20s%s\n", $option, $array['description']);
 		}
 		printf("\n");
