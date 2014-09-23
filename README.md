@@ -49,6 +49,11 @@ Currently not accepted:
 
 I'm not sure if those bizarre end-user cases *should* be supported, but they aren't as of now.
 
+Rather incidentally, it will however accept:
+
+`./script -xyzb foo` assuming -b acceptsArgument() although I think this usage is silly
+
+
 Supports "--" for end-of-options GNU pseudo-standard
 
 `--help`, `-h`, `-?` will default to a help page generated from the `description()` method of options.
