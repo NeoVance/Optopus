@@ -1,0 +1,38 @@
+{
+	"name": "kevinquinnyo/optopus",
+	"description": "A Robust and Easy Command Line Options Library.",
+	"type": "library",
+	"keywords": ["cli", "options", "commandline", "optopus"],
+	"homepage": "https://github.com/kevinquinnyo/Optopus",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Kevin Quinn",
+			"homepage": "http://github.com/kevinquinnyo"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/kevinquinnyo/Optopus/issues",
+		"source": "https://github.com/kevinquinnyo/Optopus"
+	},
+	"require": {
+		"php": ">= 5.4"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "4.2.*"
+	},
+	"suggest": {
+		"phpunit/phpunit": "Allows automated tests to be run without system-wide install."
+	},
+	"autoload": {
+		"psr-4": {
+			"Optopus\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Optopus\\Test\\": "tests"
+		}
+	}
+}
+
