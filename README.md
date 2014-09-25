@@ -9,7 +9,7 @@ Usage:
 $options = new Optopus\Options;
 
 $options->add('--foo')
-  ->alias('-f)
+  ->alias('-f')
   ->description('Foo. Set description here.');
   
 $options->add(--bar)
