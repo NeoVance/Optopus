@@ -30,6 +30,31 @@ class OptionsTest extends \PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testGet() {
+
+		$argv = [ 'script-name' ];
+		$options = new Options($argv);
+		
+		$options->add('--xray')
+			->alias('-x');
+
+		// test option	
+		$opt = $options->get('--xray');
+		$this->assertNotFalse($opt);	
+	
+		// test alias	
+		$opt = $options->get('-x');
+		$this->assertNotFalse($opt);	
+
+		// test get all
+		$allOptions = $options->get();
+		
+		$this->assertArrayHasKey('--', $allOptions);	
+		$this->assertArrayHasKey('--help', $allOptions);	
+		$this->assertArrayHasKey('--xray', $allOptions);	
+
+	}
+
 	public function testAlias() {
 
 		$argv = [ 'script-name' ];

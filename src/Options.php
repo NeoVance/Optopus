@@ -53,8 +53,16 @@ class Options {
 		return $this;
 	}
 
-	public function get($option) {
-		
+	public function get($option = null) {
+	
+		if(!isset($option)) {
+			return $this->_available;
+		}	
+
+		if($parent_option = $this->getAliasParent($option)) {
+			$option = $parent_option;
+		}
+
 		if(array_key_exists($option, $this->_available)) {
 			return $this->_available[$option];
 		}
