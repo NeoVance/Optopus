@@ -214,7 +214,6 @@ class Options {
 		
 		if($parent_option = $this->getAliasParent($option)) {
 			$option = $parent_option;
-			print_r($option);
 		}
 	
 		if(isset($this->_option_args[$option])) {
