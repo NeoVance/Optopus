@@ -387,6 +387,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase {
 		$optArgs = $options->getOptionArgs();
 
 		$this->assertArrayhasKey('-f', $optArgs);
+		$this->assertEquals('bar', $optArgs['-f']);
 
 	}
 
