@@ -236,8 +236,8 @@ class OptionsTest extends \PHPUnit_Framework_TestCase {
 
 	public function testOptionArguments() {
 
-		// test getting all _option_arguments mixed styles and overrides including the silly usage with -w near the end
-		$argv = [ 'script-name', '--foo=IGNOREME', '-f=Foo', '-b', 'Bar', '--baz', 'Baz', '--quux=Quux', '-xyzw', 'Waldo', 'asdfasdf' ];
+		// test getting all _option_arguments mixed styles and overrides including the silly usage
+		$argv = [ 'script-name', '--foo=IGNOREME', '-f=Foo', '-b', 'Bar', '--baz', 'Baz', '--quux=Quux', '-xyzw', 'Waldo', 'asdfasdf', '-xyzc=Corge' ];
 		$options = new Options($argv);
 
 		$options->add('--foo')
@@ -259,6 +259,10 @@ class OptionsTest extends \PHPUnit_Framework_TestCase {
 		$options->add('--waldo')
 			->alias('-w')
 			->acceptsArgument();
+		
+		$options->add('--corge')
+			->alias('-c')
+			->acceptsArgument();
 
 		$options->register();
 		$optionArguments = $options->getOptionArgs();
@@ -268,6 +272,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('Baz', $optionArguments['--baz']);	
 		$this->assertEquals('Quux', $optionArguments['--quux']);	
 		$this->assertEquals('Waldo', $optionArguments['--waldo']);	
+		$this->assertEquals('Corge', $optionArguments['--corge']);	
 
 	
 		// single option argument standard syntax
@@ -364,6 +369,25 @@ class OptionsTest extends \PHPUnit_Framework_TestCase {
 		$option_argument = $options->getOptionArgs('--foo');
 
 		$this->assertEquals('bar', $option_argument);	
+
+	}
+
+	public function testSillyUsage() {
+
+		$argv = [ 'script-name', '-asdf=bar'];
+                $options = new Options($argv);
+
+                $options->add('-a');
+                $options->add('-s');
+                $options->add('-d');
+                $options->add('-f')
+			->acceptsArgument();
+
+                $options->register();
+
+		$optArgs = $options->getOptionArgs();
+
+		$this->assertArrayhasKey('-f', $optArgs);
 
 	}
 
