@@ -5,7 +5,6 @@ namespace Optopus;
 class Options {
 	
 	protected $_current_option;
-	protected $_option_args = [];
 	protected $_available = [
 		
 		// initialize with GNU standard 'end-of-options' option, and GNU standard help option

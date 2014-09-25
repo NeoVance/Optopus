@@ -1,0 +1,43 @@
+#!/usr/bin/env php
+<?php
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+use Optopus\Options;
+
+$options = new Options($argv);
+
+$options->add('--foo')
+	->alias('-f')
+	->acceptsArgument();
+
+	$options->add('--bar')
+		->alias('-b')
+		->acceptsArgument()
+		->description('Bar.  Add description here.');
+
+	$options->add('--baz')
+		->alias('-z')
+		->acceptsArgument();
+
+	$options->add('--quux')
+		->alias('-q')
+		->acceptsArgument();
+
+	$options->add('--waldo')
+		->alias('-w')
+		->acceptsArgument();
+
+	$options->add('--corge')
+		->alias('-c')
+		->acceptsArgument();
+
+	$options->add('--verbose')
+		->alias('-v')
+		->repeats()
+		->description('Verbosity.  Add more to amplify. ie: -vvvvvv');
+
+$options->register();
+
+print_r($options);
+
