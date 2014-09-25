@@ -213,7 +213,7 @@ class Options {
 				// if a 'silly' style -asdf=bar was inside the cluster we tag it onto the end, and advance internal pointer once again
 				if(isset($option_arg)) {
 					$tokens[] = $option_arg;
-					//next($tokens);
+					unset($option_arg);
 				}
 			}
 		}
