@@ -116,7 +116,6 @@ class OptionsTest extends \PHPUnit_Framework_TestCase {
 		
 		$options = new Options($argv);
 	
-		// optional argument	
 		$options->add('--verbose')
 			->alias('-v')
 			->repeats();
