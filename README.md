@@ -37,21 +37,16 @@ Option Arguments can be called with the following syntaxes:
 
 `./script -b=foo`
 
-It will also allow 'clustered' short options ie: `-asdf` is equal to `-a -s -d -f`
+It will also allow 'clustered' short options ie: `-asdf` is equal to `-a -s -d -f`.  In addition, option arguments can be provided with 'clustered' short options, ie:
+
+`./script -asdf=bar`
+
+`./script -asdf bar`
 
 
-Currently not accepted:
+This will not work as of now:
 
-`./script -xyzb=foo` assuming -b acceptsArgument()  This will not work as expected
-
-`./script --barFOO` no spaces. assuming --bar acceptsArgument()  This will not work as expected
-
-
-I'm not sure if those bizarre end-user cases *should* be supported, but they aren't as of now.
-
-Rather incidentally, it will however accept:
-
-`./script -xyzb foo` assuming -b acceptsArgument() although I think this usage is silly
+`./script --barFOO` no spaces. assuming --bar acceptsArgument()  This will not work as expected.  Still not sure if this *should* be supported.
 
 
 Supports "--" for end-of-options GNU pseudo-standard
