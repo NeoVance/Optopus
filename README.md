@@ -55,3 +55,23 @@ Supports "--" for end-of-options GNU pseudo-standard
 
 Also preserves script arguments (not captured by option arguments), by calling getArguments() method.
 
+
+Demo script:
+
+If you'd like to give it a test, do the following:
+
+`git clone ...`
+
+`cd Optopus/src`
+
+`chmod u+x script`
+
+`./script ARG0 --foo=bar ARG1 -f=Foo -b Bar ARG2 --baz Baz --quux=Quux -xyzw Waldo ARG3 -xyzc=Corge -v --verbose -vv --verbose`
+
+You can also try:
+
+`./script --help`
+
+To see all usage, the tests are helpful too.
+
+
