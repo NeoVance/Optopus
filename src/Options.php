@@ -5,6 +5,7 @@ namespace Optopus;
 class Options {
 	
 	protected $_current_option;
+	protected $_option_args = [];
 	protected $_available = [
 		
 		// initialize with GNU standard 'end-of-options' option, and GNU standard help option
@@ -182,8 +183,21 @@ class Options {
 		// clustered shortopt to acceptsArgument() properly, even though that's a strange end-user usage.
 
 		foreach($tokens as $key => $selected) {
+
+			// Below conditions explained:
+			// cond1: argType is short
+			// cond2: it is clustered (more than 2 chars including dash), ie: -as, NOT just -a
+			// cond3: it is not a shortopt with argument using "=" style syntax, ie: -f=foo
 			if($this->argType($selected) === 'short' && strlen($selected) > 2 && $selected[2] !== "=") {
 
+				// if it still has an "=", then it's a 'silly' but acceptable syntax.  Clustered, short, AND "=" style option arg for the last one
+				// ie:  -asdf=bar
+				//
+				if(strstr($selected, "=")) {
+					$arr = explode("=", $selected);
+					$option_arg = "-".substr($arr[0], -1)."=".$arr[1]; // "-f=bar"
+					$selected = $arr[0]; // -asd
+				}
 				// unset the "-asdf"
 				unset($tokens[$key]);
 
@@ -195,6 +209,12 @@ class Options {
 				// we did array_splice, so we have to manually advance the internal array pointer by the amount of shortopts
 				// kind of a hack, but it's necessary
 				for($i=0; $i<count($shortopts); $i++) { next($tokens); }
+
+				// if a 'silly' style -asdf=bar was inside the cluster we tag it onto the end, and advance internal pointer once again
+				if(isset($option_arg)) {
+					$tokens[] = $option_arg;
+					//next($tokens);
+				}
 			}
 		}
 
