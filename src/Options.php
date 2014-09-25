@@ -28,12 +28,20 @@ class Options {
 
 	}
 
-	// Build Options functions
+	// Build Options and Get/Set
 
 	public function title($title) {
 		
 		// default is script name -- used for help page.  Override that here
 		$this->title = $title;
+	}
+
+	public function getTitle() {
+
+		// mainly for testsuite but it might be useful outside of that
+		return $this->title;
+		return false;
+
 	}
 
 	public function add($option) {
@@ -45,6 +53,14 @@ class Options {
 		return $this;
 	}
 
+	public function get($option) {
+		
+		if(array_key_exists($option, $this->_available)) {
+			return $this->_available[$option];
+		}
+		return false;
+	}
+
 	public function alias($alias) {
 
 		// add available alias for an option
@@ -52,6 +68,13 @@ class Options {
 	
 		return $this;
 
+	}
+
+	public function required() {
+
+		$this->_available[$this->_current_option]['required'] = true;
+
+		return $this;
 	}
 
 	public function acceptsArgument($required = false) {
@@ -72,6 +95,7 @@ class Options {
 		// for options like --verbose or -v where repeating the option results in amplification like -vvvvvv ... or -v -v -v or --verbose --verbose (less common but should be allowed)
 
 		$this->_available[$this->_current_option]['repeats'] = true;
+		$this->_available[$this->_current_option]['repeat_count'] = 0; // just init to 0 since we haven't parsed actual selected opts yet
 		
 		return $this;
 		
@@ -115,7 +139,7 @@ class Options {
 		return false;
 	}
 
-	private function getAliasParent($alias) {
+	public function getAliasParent($alias) {
 
 		foreach($this->_available as $option => $array) {
 			if(array_key_exists('aliases', $array)) {
@@ -182,12 +206,38 @@ class Options {
 
 	}
 
+	public function getOptionArgs($option = null) {
+
+		if(!isset($option)) {
+			return $this->_option_args;
+		}
+		
+		if($parent_option = $this->getAliasParent($option)) {
+			$option = $parent_option;
+			print_r($option);
+		}
+	
+		if(isset($this->_option_args[$option])) {
+			return $this->_option_args[$option];
+		}
+		return false;
+
+	}
+
 	private function setArgument($arg) {
 
 		// main script arguments (not options or option args) ie:  ./script --foo bar baz
 		// assuming foo accepts arguments, then baz is a script argument
 
 		$this->arguments[] = $arg;	
+	}
+
+	public function getArguments() {
+		
+		if(isset($this->arguments)) {
+			return $this->arguments;
+		}
+		return false;
 	}
 
 	private function allowsArgument($option) {
