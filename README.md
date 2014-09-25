@@ -5,7 +5,7 @@ Yet another PHP CLI options parser.  Strives to be simple, robust, user-friendly
 
 Usage:
 
-```
+```php
 $options = new Optopus\Options;
 
 $options->add('--foo')
@@ -58,5 +58,5 @@ Supports "--" for end-of-options GNU pseudo-standard
 
 `--help`, `-h`, `-?` will default to a help page generated from the `description()` method of options.
 
-
+Also preserves script arguments (not captured by option arguments), by calling getArguments() method.
 
