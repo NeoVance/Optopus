@@ -60,7 +60,7 @@ Demo script:
 
 If you'd like to give it a test, do the following:
 
-`git clone ...`
+`git clone git@github.com:kevinquinnyo/Optopus.git`
 
 `cd Optopus/src`
 
