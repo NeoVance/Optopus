@@ -12,8 +12,8 @@ $options->add('--foo')
   ->alias('-f')
   ->description('Foo. Set description here.');
   
-$options->add(--bar)
-  ->alias(-b)
+$options->add('--bar')
+  ->alias('-b')
   ->acceptsArgument('required')
   ->description('Bar.  Set description here.  This option requires an additional argument.');
   
