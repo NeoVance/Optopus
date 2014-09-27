@@ -327,10 +327,19 @@ class Options {
 			printf("\n%s\n\n", $this->title);
 		}
 		foreach($this->_available as $option => $array) {
-			if(!isset($array['description'])) {
-				$array['description'] = "No description available.";
+			$description = isset($array['description']) ? $array['description'] : "No description available.";
+			$requirement = isset($array['required']) ? "Required." : '';
+			$optargs = isset($array['accepts_argument']) ? "<optional arg>" : '';
+			if(isset($array['requires_argument'])) {
+				$optargs = "<required arg>";
 			}
-			printf("%-20s%s\n", $option, $array['description']);
+			
+			if(isset($array['aliases'])) {
+				foreach($array['aliases'] as $key => $alias) {
+					$option .= ", ".$alias;
+				}
+			}
+			printf("%-32s%s%s\n", $option." ".$optargs, $description, $requirement);
 		}
 		printf("\n");
 	}	
