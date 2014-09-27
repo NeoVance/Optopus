@@ -18,7 +18,7 @@ $options->add('--foo')
 
 	$options->add('--baz')
 		->alias('-z')
-		->acceptsArgument();
+		->acceptsArgument('required');
 
 	$options->add('--quux')
 		->alias('-q')
@@ -30,7 +30,8 @@ $options->add('--foo')
 
 	$options->add('--corge')
 		->alias('-c')
-		->acceptsArgument();
+		->acceptsArgument()
+		->required();
 
 	$options->add('--verbose')
 		->alias('-v')
