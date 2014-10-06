@@ -175,6 +175,20 @@ class Options {
 	
 	}
 
+	public function getSelected($option = null) {
+
+		$selected = [];
+		if(isset($option) && isset($this->_available[$option]['selected']) && $this->_available[$option]['selected']) {
+			return $this->_available[$option];
+		}
+		foreach($this->_available as $option) {
+			if(isset($option['selected']) && $option['selected']) {
+				$selected[] = $option;
+			}
+		}
+		return $selected;
+	}
+
 	private function explodeShortOpts(&$tokens) {
 
 		// this finds clustered shortopts, ie: -asdf and converts them to -a -s -d -f 
