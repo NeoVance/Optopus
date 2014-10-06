@@ -181,9 +181,9 @@ class Options {
 		if(isset($option) && isset($this->_available[$option]['selected']) && $this->_available[$option]['selected']) {
 			return $this->_available[$option];
 		}
-		foreach($this->_available as $option) {
+		foreach($this->_available as $name => $option) {
 			if(isset($option['selected']) && $option['selected']) {
-				$selected[] = $option;
+				$selected[$name] = $option;
 			}
 		}
 		return $selected;
