@@ -3,7 +3,8 @@
 namespace Optopus;
 
 class Options {
-	
+
+	public $arguments = [];	
 	protected $_current_option;
 	protected $_available = [
 		
