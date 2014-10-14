@@ -150,11 +150,6 @@ class Options {
 
 	public function getAliasParent($alias) {
 
-		// convenience so you can call without getAliasParent('-v') or getAliasParent('v')
-		if($alias[0] !== '-') {
-			$alias = "-".$alias;
-		}
-
 		foreach($this->_available as $option => $array) {
 			if(array_key_exists('aliases', $array)) {
 				if(in_array($alias, $array['aliases'])) {
@@ -186,8 +181,6 @@ class Options {
 		$selected = [];
 		if(isset($option) && isset($this->_available[$option]['selected']) && $this->_available[$option]['selected']) {
 			return $this->_available[$option];
-		} else {
-			return false;
 		}
 		foreach($this->_available as $name => $option) {
 			if(isset($option['selected']) && $option['selected']) {
@@ -224,22 +217,7 @@ class Options {
 
 				// repopulate as individual options
 				$shortopts = str_split($this->strip_leading_dashes($selected));
-				foreach($shortopts as &$shortopt) {
-					if(isset($flag)) {
-						$ptr = current($shortopts);
-						$opt_args = implode(array_slice($shortopts, $ptr));
-						$shortopts = array_slice($shortopts, 0, $ptr - 1);
-						$shortopts[] = $flag;
-						$shortopts[] = $opt_args;
-						break;
-					}
-					$shortopt = "-".$shortopt; 
-					$option = $this->get($shortopt);
-					if(isset($option['accepts_argument'])) {
-						$flag = $shortopt;
-					}
-					
-				}
+				array_walk($shortopts, function(&$shortopt) { $shortopt = "-".$shortopt; });
 				array_splice($tokens, $key, 0, $shortopts);
 
 				// we did array_splice, so we have to manually advance the internal array pointer by the amount of shortopts
