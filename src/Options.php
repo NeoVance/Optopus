@@ -176,6 +176,15 @@ class Options {
 	
 	}
 
+	public function isSelected($option) {
+	
+		if(isset($option) && isset($this->_available[$option]['selected']) && $this->_available[$option]['selected']) {
+			return $this->_available[$option];
+		}
+		return false;
+		
+	}
+
 	public function getSelected($option = null) {
 
 		$selected = [];
