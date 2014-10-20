@@ -22,7 +22,7 @@ $options->add('--verbose')
   ->repeats()
   ->description('Verbosity.  You can amplify by adding again ie: -vvv or -v -v or --verbose --verbose');
   
-$options->register();
+$options->parse();
 
 print_r($options);
 ```
