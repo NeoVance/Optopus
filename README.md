@@ -44,16 +44,14 @@ It will also allow 'clustered' short options ie: `-asdf` is equal to `-a -s -d -
 `./script -asdf bar`
 
 
-This will not work as of now:
+This will also work:
 
-`./script --barFOO` no spaces. assuming --bar acceptsArgument()  This will not work as expected.  Still not sure if this *should* be supported.
+`./script --barFOO` no spaces.
 
 
 Supports "--" for end-of-options GNU pseudo-standard
 
 `--help`, `-h`, `-?` will default to a help page generated from the `description()` method of options.
-
-Also preserves script arguments (not captured by option arguments), by calling getArguments() method.
 
 
 Demo script:
@@ -66,7 +64,9 @@ If you'd like to give it a test, do the following:
 
 `chmod u+x script`
 
-`./script ARG0 --foo=bar ARG1 -f=Foo -b Bar ARG2 --baz Baz --quux=Quux -xyzw Waldo ARG3 -xyzc=Corge -v --verbose -vv --verbose`
+It handles arguments in a way that you would expect.  For instance, try the following silly usage:
+
+`./script ARG0 -v -vv --foo=bar ARG1 -f=Foo -b Bar ARG2 --baz Baz --quux=Quux -xyzw Waldo ARG3 -xyzc=Corge -v --verbose -vv --verbose`
 
 You can also try:
 
