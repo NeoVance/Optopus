@@ -14,9 +14,14 @@ $options->add('--foo')
   
 $options->add('--bar')
   ->alias('-b')
+  ->acceptsArgument('')
+  ->description('Bar.  Set description here.  This option allows an optional argument.');
+  
+$options->add('--baz')
+  ->alias('-z')
   ->acceptsArgument('required')
   ->description('Bar.  Set description here.  This option requires an additional argument.');
-  
+
 $options->add('--verbose')
   ->alias('-v')
   ->repeats()
