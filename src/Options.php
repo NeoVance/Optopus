@@ -6,6 +6,17 @@ class Options {
 
 	public $optArgs = [];
 
+	public $options = [
+		
+		'--' => [
+			'description' => 'End of Options.  Everything after this option will be considered a script argument.',
+		],
+
+		'--help' => [
+			'description' => 'Generates this help output.',
+		],
+	];
+
 	public function __construct($argv) {
 
 		$this->script = array_shift($argv);
@@ -41,11 +52,15 @@ class Options {
 	
 	public function description($description) {
 
-		if(isset($description)) {
-			$description = 'No description available.';
-		}
 		$this->options[$this->current_option]['description'] = $description;
 		return $this;
+	}
+
+	public function title($title) {
+
+		// displayed in _help() page
+		$this->title = $title;
+		
 	}
 
 	public function acceptsArgument($required = null) {
@@ -76,9 +91,43 @@ class Options {
 		}
 	}
 
+	public function helpOverride($help) {
+
+		$this->help_override = $help;
+	}
+
+	private function _help() {
+
+		$heading = isset($this->title) ? $this->script." - ".$this->title : $this->script;
+		printf("%s\n\n", $heading);
+
+		if(isset($this->help_override)) {
+			echo $this->help_override;
+		} else {
+			foreach($this->options as $name => $Option) {
+
+				$aliases = '';
+				if(isset($Option['aliases'])) {
+					$aliases = '|';
+					foreach($Option['aliases'] as $alias) {
+						$aliases .= $alias;
+					}
+				}
+
+				$desc = isset($Option['description']) ? $Option['description'] : 'No description available.';
+
+				printf("\t%-30s%s\n", $name.$aliases, $desc);
+			}
+			printf("\n");
+		}
+	}
+
 	private function _isCluster($token) {
 
-		if(strlen($token) > 2 && $token[0] === "-" && $token[1] !== "-") {
+		// for code simplicity, we consider a "cluster" to be like:  -asdf as you would expect, but also a single shortopt qualifies, ie:
+		// -a
+
+		if($token[0] === "-" && $token[1] !== "-") {
 			return true;	
 		}
 		return false;
@@ -169,7 +218,8 @@ class Options {
 		$tokens = str_split($token);
 		foreach($tokens as $key => $opt) {
 			// only set option args if it allows them, AND the NEXT token is NOT an option itself
-			if($this->_acceptsArgument("-".$opt) && isset($tokens[$key + 1]) && !$this->_isOption("-".$tokens[$key + 1])) {
+			// or if it REQUIRES an argument then set everything after it
+			if($this->_requiresArgument("-".$opt) || ($this->_acceptsArgument("-".$opt) && isset($tokens[$key + 1]) && !$this->_isOption("-".$tokens[$key + 1]))) {
 				$opts = substr($token, 0, $key + 1);
 				$arg = substr($token, $key + 1);
 				if($arg[0] === "=") {
@@ -187,10 +237,14 @@ class Options {
 		
 	}
 
-	private function _setOptArg($opt, $arg) {
+	private function _setOptionSelected($option) {
 
-		// not needed
-		//$opt = $this->_addDashes($opt);
+		$Option = $this->_getOption($option);
+		$this->options[key($Option)]['selected'] = true;
+		
+	}
+
+	private function _setOptArg($opt, $arg) {
 
 		$Option = $this->_getOption($opt);
 		$this->optArgs[key($Option)] = $arg;
@@ -236,15 +290,21 @@ class Options {
 				}
 			} else {
 				// longopt
-				if(strstr($token, "=")) {
-					$option_args = explode("=", $token);
-					if($this->_acceptsArgument($option_args[0])) {
-						$parsedTokens[] = $option_args[0];
-						$parsedTokens[] = $option_args[1];
+				$option = '';
+				$token = str_replace('=', '', $token);
+				foreach(str_split($token) as $key => $char) {
+					$option .= $char;
+					if($this->_isOption($option)) {
+						// everything after is optArg
+						if($this->_acceptsArgument($option)) {
+							$arg = substr($token, $key + 1);
+							$parsedTokens[] = $option;
+							$parsedTokens[] = $arg;
+							continue 2;
+						}
 					}
-				} else {
-					$parsedTokens[] = $token;
 				}
+				$parsedTokens[] = $token;
 			}
 		}
 		$this->normalized = $parsedTokens;
@@ -265,7 +325,6 @@ class Options {
 
 	private function _acceptsArgument($option) {
 	
-		//$option = $this->_addDashes($option);
 	
 		if($this->_isOption($option)) {
 			$Option = $this->_getOption($option);
@@ -280,14 +339,13 @@ class Options {
 
 	private function _requiresArgument($option) {
 
-		//$option = $this->_addDashes($option);
-
 		if($this->_isOption($option)) {
 			$Option = $this->_getOption($option);
-		}
-
-		if(isset($Option['requires_argument'])) {
-			return true;
+			foreach($Option as $option) {
+				if(isset($option['requires_argument'])) {
+					return true;
+				}
+			}
 		}
 		return false;
 		
@@ -296,18 +354,26 @@ class Options {
 	public function parse() {
 
 		foreach($this->_normalize() as $token) {
-			if(!$this->_isOption($token)) {
+			if($token === '--help') {
+				$this->_help();
+				die();
+			}
+			if($this->_isOption($token)) {
+				$this->_setOptionSelected($token);
+			} else {
 				$this->_setArgument($token);
 			}
 			if(isset($previous) && $this->_acceptsArgument($previous)) {
 	
-				// if it REQUIRES argument, set whatever token is after previous as it's optArg, regardless
+				// if it accepts AND REQUIRES argument, set whatever token is after previous as it's optArg, regardless
+				// and unset it as a SCRIPT argument
 				if($this->_requiresArgument($previous)) {
 					$this->_setOptArg($previous, $token);
 					$this->_unSetArgument($token);
 				}
 
-				// if it ACCEPTS OPTIONAL argument, set next token as the optArg only if it itself, isnt an option
+				// if it merely ACCEPTS OPTIONAL argument, set next token as the optArg only if it itself, is NOT an option
+				// and unset it as a SCRIPT argument
 				if(!$this->_isOption($token)) {
 					$this->_setOptArg($previous, $token);
 					$this->_unSetArgument($token);
@@ -319,6 +385,7 @@ class Options {
 			}
 			$previous = $token;
 		}
+
 	}
 }
 

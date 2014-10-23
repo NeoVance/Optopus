@@ -1,13 +1,14 @@
 #!/usr/bin/env php
 <?php
 
-print_r($argv);
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 use Optopus\Options;
 
 $options = new Options($argv);
+
+$options->title('Does some cool things');
 
 $options->add('--foo')
 	->alias('-f')
@@ -18,6 +19,7 @@ $options->add('--foo')
 		->acceptsArgument()
 		->description('Bar.  Add description here.');
 
+	
 	$options->add('--baz')
 		->alias('-z')
 		->acceptsArgument('required');
@@ -39,6 +41,9 @@ $options->add('--foo')
 		->alias('-v')
 		->repeats()
 		->description('Verbosity.  Add more to amplify. ie: -vvvvvv');
+
+	$options->add('--kablammo')
+		->alias('-k');
 
 $options->parse();
 
