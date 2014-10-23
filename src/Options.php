@@ -359,8 +359,6 @@ class Options {
 
 	public function parse() {
 
-		$end = false;
-
 		foreach($this->_normalize() as $token) {
 
 			if($token === '--help') {
