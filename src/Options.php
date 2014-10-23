@@ -284,6 +284,12 @@ class Options {
 		$given = $this->given;
 		foreach($given as $token) {
 
+			if($end || $token === "--") {
+				$end = true;
+				$parsedTokens[] = $token;
+				continue;
+			}
+
 			if($this->_isCluster($token)) {
 				foreach($this->_deCluster($token) as $dtoken) {
 					$parsedTokens[] = $dtoken;
@@ -353,11 +359,15 @@ class Options {
 
 	public function parse() {
 
+		$end = false;
+
 		foreach($this->_normalize() as $token) {
+
 			if($token === '--help') {
 				$this->_help();
 				die();
 			}
+
 			if($this->_isOption($token)) {
 				$this->_setOptionSelected($token);
 			} else {
