@@ -51,7 +51,7 @@ This will also work:
 
 Supports "--" for end-of-options GNU pseudo-standard
 
-`--help`, `-h`, `-?` will default to a help page generated from the `description()` method of options.
+`--help` will default to a help page generated from the `description()` method.  As of now this can be overriden by calling public method `helpOverride`, ie - `$options->helpOverride($string)` where `$string` is a full help page string.  This is only useful if you want to add a lot of custom help information for various options.
 
 
 Demo script:
