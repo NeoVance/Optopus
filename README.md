@@ -77,6 +77,6 @@ You can also try:
 
 `./script --help`
 
-To see all usage, the tests are helpful too.
+To see all usage, the tests are helpful too. @todo tests not passing yet since refactor
 
 
