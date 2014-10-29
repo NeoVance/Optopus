@@ -1,167 +1,34 @@
 <?php
 
-namespace Optopus;
-
-class Options {
-
-	public $optArgs = [];
-
-	public $options = [
-		
-		'--' => [
-			'description' => 'End of Options.  Everything after this option will be considered a script argument.',
-		],
-
-		'--help' => [
-			'description' => 'Generates this help output.',
-		],
-	];
+class Options
+{
 
 	public function __construct($argv) {
-
+		
 		$this->script = array_shift($argv);
 		$this->given = $argv;
 	}
 
-	// define options, aliased options, etc..
-	public function add($option) {
+	protected function _isCluster($tokens) {
 
-		$this->current_option = $option;
-		$this->options[$option] = [];
-		return $this;
-	}
-
-	public function alias($alias) {
-
-		$this->options[$this->current_option]['aliases'][] = $alias;
-		return $this;
-	}
-	
-	public function required() {
-
-		$this->options[$this->current_option]['required'] = true;
-		return $this;
-	}
-
-	public function repeats() {
-
-		$this->options[$this->current_option]['repeats'] = true;
-		$this->options[$this->current_option]['repeat_count'] = 0;
-		return $this;
-	}
-	
-	public function description($description) {
-
-		$this->options[$this->current_option]['description'] = $description;
-		return $this;
-	}
-
-	public function title($title) {
-
-		// displayed in _help() page
-		$this->title = $title;
-		
-	}
-
-	public function acceptsArgument($required = null) {
-
-		$this->options[$this->current_option]['accepts_argument'] = true;
-
-		if($required === strtolower('required')) {
-			$this->options[$this->current_option]['requires_argument'] = true;
-		}
-		return $this;
-	}
-	
-	public function get($option = null) {
-
-		if(!isset($option)) {
-			return $this->options;
-		}
-
-		if($this->_isOption($option)) {
-			return $this->_getOption($option);
-		}
-	}
-
-	public function getAlias($alias) {
-
-		if($this->_isOption($alias)) {
-			return $this->_getOption($alias);
-		}
-	}
-
-	public function helpOverride($help) {
-
-		$this->help_override = $help;
-	}
-
-	private function _help() {
-
-		$heading = isset($this->title) ? $this->script." - ".$this->title : $this->script;
-		printf("%s\n\n", $heading);
-
-		if(isset($this->help_override)) {
-			echo $this->help_override;
-		} else {
-			foreach($this->options as $name => $Option) {
-
-				$aliases = '';
-				if(isset($Option['aliases'])) {
-					$aliases = '|';
-					foreach($Option['aliases'] as $alias) {
-						$aliases .= $alias;
-					}
-				}
-
-				$desc = isset($Option['description']) ? $Option['description'] : 'No description available.';
-
-				printf("\t%-30s%s\n", $name.$aliases, $desc);
-			}
-			printf("\n");
-		}
-	}
-
-	private function _isCluster($token) {
-
-		// for code simplicity, we consider a "cluster" to be like:  -asdf as you would expect, but also a single shortopt qualifies, ie:
-		// -a
-
-		if($token[0] === "-" && $token[1] !== "-") {
-			return true;	
+		if($tokens[0] == "-" && $tokens[1] !== "-" && strlen($tokens) > 2) {
+			return true;
 		}
 		return false;
+
 	}
 
-	private function _stripLeadingDashes($token) {
+	protected function _isAlias($alias) {
 
-		return preg_replace('/^-+/', '' ,$token);
-	}
-
-	private function _getAliasParent($alias) {
-
-		//$alias = $this->_addDashes($alias);
-
-		foreach($this->options as $name => $option) {
-			if(array_key_exists('aliases', $option)) {
-				if(in_array($alias, $option['aliases'])) {
-					return [$name => $option];	
-				}
+		foreach($this->options as $option) {
+			if(array_key_exists('aliases', $option) && in_array($alias, $option['aliases'])) {
+				return true;
 			}
 		}
 		return false;
 	}
 
-	private function _isAlias($option) {
-		
-		//$option = $this->_addDashes($option);
-
-		return $this->_getAliasParent($option);
-	}
-
-	private function _isOption($option) {
-
-		//$option = $this->_addDashes($option);
+	protected function _isOption($option) {
 
 		if(array_key_exists($option, $this->options) || $this->_isAlias($option)) {
 			return true;
@@ -169,232 +36,275 @@ class Options {
 		return false;
 	}
 
-	private function _repeats($option) {
+	protected function _getOption($option) {
 
-		//$option = $this->_addDashes($option);
-		$Option = $this->_getOption($option);
-
-		if($Option) {
-			foreach($Option as $option) {
-				if(isset($option['repeats'])) {
-					return true;
+		if($this->_isOption($option)) {
+			if(array_key_exists($option, $this->options)) {
+				return [$option => $this->options[$option]];
+			} else {
+				$alias = $option;
+				foreach($this->options as $parent => $option) {
+					if(array_key_exists('aliases', $option) && in_array($alias, $option['aliases'])) {
+						return [$parent => $this->options[$parent]];
+					}
 				}
+			}
+		}
+		return null;
+	}
+
+	protected function _looksLikeOption($token) {
+
+		return $this->_looksLikeLongOpt($token) || $this->_looksLikeShortOpt($token);
+		return false;
+	}
+
+	protected function _looksLikeShortOpt($token) {
+
+		if($token[0] === "-" && strlen($token) == 2 && $token[1] !== "-") {
+			return true;	
+		}
+		return false;
+	}
+
+	protected function _looksLikeLongOpt($token) {
+
+		// if token[2] is not set, then this is actually end-of-options "--"
+		if($token[0] === "-" && $token[1] === "-" && isset($token[2])) {
+			return true;
+		}
+		return false;
+	}
+
+	protected function _acceptsArgument($option) {
+
+		if(isset($this->options[$option]) && array_key_exists('accepts_argument', $this->options[$option])) {
+			return true;
+		}
+		return false;
+	}
+
+	protected function _requiresArgument($option) {
+
+		if(isset($this->options[$option]) && array_key_exists('requires_argument', $this->options[$option])) {
+			return true;
+		}
+		return false;
+	}
+
+	protected function _strip_leading_dashes($opt) {
+
+		return preg_replace('/^-+/', '' ,$opt);
+	}
+
+	protected function _deCluster($tokens) {
+
+		$tokens = substr($tokens, 1); // remove leading dash
+		$declustered = str_split($tokens);
+		foreach($declustered as $key => $opt) {
+			
+			// if it requires arg, then everything after it is arg
+			if($this->_requiresArgument("-".$opt)) {
+				$flag = 1;
+			}
+
+			// if it only accepts arg, everything after is arg unless next is also an option
+			if($this->_acceptsArgument("-".$opt)) {
+				if(isset($declustered[$key + 1]) && !$this->_isOption("-".$declustered[$key + 1]) || isset($flag)) {
+					$arg = !empty(implode('', array_slice($declustered, $key + 1))) ? implode('', array_slice($declustered, $key + 1)) : null;
+					if($arg[0] === "=") {
+						$arg = substr($arg, 1);
+					}
+					$result = array_slice($declustered, 0, $key + 1);
+					array_walk($result, function(&$opt) { $opt = "-".$opt; });
+					if(isset($arg)) {
+						$result[] = $arg;
+					}
+					break;
+				}
+			} else {
+				$result[] = "-".$opt;
+			}
+		}
+		return $result;
+	}
+
+	// Option construction methods
+
+	private function _prohibited($option) {
+
+		// we can't allow an option to literally contain "=".  I don't know why someone would do that, but it will break things.
+		// we also can't allow literally "-" as an option for similar reasons ("--" is end-of-options already).
+
+		if(strstr($option, "=") || $option === "-") {
+			return true;
+		}
+		return false;
+	}
+
+	public function add($option) {
+
+		if($this->_prohibited($option)) {
+			throw new Exception("Attmepted to add prohibited option $option");
+			// @todo friendlier error handling here
+		}
+
+		$this->_current_option = $option;
+		$this->options[$option] = [];
+		return $this;
+	}
+
+	public function alias($alias) {
+
+		if($this->_prohibited($alias)) {
+			throw new Exception("Attmepted to add prohibited option $alias");
+		}
+
+		$this->options[$this->_current_option]['aliases'][] = $alias;
+		return $this;
+	}
+
+	public function required() {
+
+		$this->options[$this->_current_option]['required'] = true;
+		return $this;
+	}
+
+	public function acceptsArgument() {
+
+		$this->options[$this->_current_option]['accepts_argument'] = true;
+		return $this;
+	}
+
+	public function requiresArgument() {
+
+		$this->options[$this->_current_option]['accepts_argument'] = true;
+		$this->options[$this->_current_option]['requires_argument'] = true;
+		return $this;
+	}
+
+	public function repeats() {
+
+		$this->options[$this->_current_option]['repeats'] = true;
+		$this->options[$this->_current_option]['repeat_count'] = 0;
+		return $this;
+	}
+
+	protected function _setOptArg($option, $arg) {
+
+		$Option = $this->_getOption($option);
+		foreach($Option as $name => $value) {
+			$this->options[$name]['arg'] = $arg;
+		}
+	}
+
+	protected function _setSelected($option) {
+
+		$Option = $this->_getOption($option);
+		foreach($Option as $name => $value) {
+			$this->options[$name]['selected'] = true;
+		}
+	}
+
+	protected function _incrementRepeats($option) {
+
+		$Option = $this->_getOption($option);
+		foreach($Option as $name => $value) {
+			$this->options[$name]['repeat_count'] += 1;
+		}
+	}
+
+	protected function _repeats($option) {
+
+		$Option = $this->_getOption($option);
+		foreach($Option as $name => $value) {
+			if(isset($this->options[$name]['repeats'])) {
+				return true;
 			}
 		}
 		return false;
 	}
 
-	private function _incrementRepeatsFor($option) {
+	protected function _normalize() {
 
-		//$option = $this->_addDashes($option);
-		$Option = $this->_getOption($option);
-		reset($Option);
-
-		$this->options[key($Option)]['repeat_count'] +=1;
-
-	}
-
-	private function _getOption($option) {
-		
-		//$option = $this->_addDashes($option);
-		
-		if($parentOption = $this->_getAliasParent($option)) {
-			return $parentOption;
-		}
-
-		if($this->_isOption($option)) {
-			$Option = [ $option => $this->options[$option] ];
-			return $Option;
-		}
-		return null;
-
-	}
-
-	private function _handleClusteredOptArgs($token) {
-
-		$opts = '';
-		$arg = '';
-		$token = $this->_stripLeadingDashes($token);
-		$tokens = str_split($token);
-		foreach($tokens as $key => $opt) {
-			// only set option args if it allows them, AND the NEXT token is NOT an option itself
-			// or if it REQUIRES an argument then set everything after it
-			if($this->_requiresArgument("-".$opt) || ($this->_acceptsArgument("-".$opt) && isset($tokens[$key + 1]) && !$this->_isOption("-".$tokens[$key + 1]))) {
-				$opts = substr($token, 0, $key + 1);
-				$arg = substr($token, $key + 1);
-				if($arg[0] === "=") {
-					$arg = substr($arg, 1);
-				}
-				break;
-			}
-			else {
-				$opts .= $opt;
-			}
-		}
-		$optargs['opts'] = $opts;
-		$optargs['arg'] = $arg;
-		return $optargs;
-		
-	}
-
-	private function _setOptionSelected($option) {
-
-		$Option = $this->_getOption($option);
-		$this->options[key($Option)]['selected'] = true;
-		
-	}
-
-	private function _setOptArg($opt, $arg) {
-
-		$Option = $this->_getOption($opt);
-		$this->optArgs[key($Option)] = $arg;
-		$this->options[key($Option)]['argument'] = $arg;
-	}
-
-	private function _setArgument($argument) {
-
-		$this->arguments[] = $argument;
-	}
-
-	private function _unSetArgument($argument) {
-
-		$key = array_search($argument, $this->arguments);
-		unset($this->arguments[$key]);
-	}
-	
-	private function _deCluster($token) {
-
-		$optargs = $this->_handleClusteredOptArgs($token);
-		$opts = !empty($optargs['opts']) ? $optargs['opts'] : null;
-		$arg = !empty($optargs['arg']) ? $optargs['arg'] : null;
-
-		foreach(str_split($opts) as $opt) {
-			$dtokens[] = "-".$opt;	
-		}
-
-		if(isset($arg)) {
-			$dtokens[] = $arg;
-		}
-		return $dtokens;
-	}
-
-	private function _normalize() {
-
-		$parsedTokens = [];
-		$given = $this->given;
-		foreach($given as $token) {
-
-			if($end || $token === "--") {
-				$end = true;
-				$parsedTokens[] = $token;
-				continue;
-			}
-
+		foreach($this->given as $key => $token) {
 			if($this->_isCluster($token)) {
 				foreach($this->_deCluster($token) as $dtoken) {
-					$parsedTokens[] = $dtoken;
+					$this->_normalized[] = $dtoken;	
 				}
 			} else {
-				// longopt
-				$option = '';
-				$token = str_replace('=', '', $token);
-				foreach(str_split($token) as $key => $char) {
-					$option .= $char;
-					if($this->_isOption($option)) {
-						// everything after is optArg
-						if($this->_acceptsArgument($option)) {
-							$arg = substr($token, $key + 1);
-							$parsedTokens[] = $option;
-							$parsedTokens[] = $arg;
-							continue 2;
-						}
-					}
+				if(strstr($token, "=")) {
+					list($opt, $arg) = explode("=", $token);
+					$this->_normalized[] = $opt;
+					$this->_normalized[] = $arg;
+				} else {
+					$this->_normalized[] = $token;
 				}
-				$parsedTokens[] = $token;
 			}
 		}
-		$this->normalized = $parsedTokens;
-		return $this->normalized;
 	}
 
-	private function _addDashes($option) {
-	
-		// convenience method
+	protected function _addDashes($option) {
+
 		if($option[0] !== "-") {
 			if(strlen($option) > 1) {
-				return "--".$option;
+				$option = "--".$option;
+			} else {
+				$option = "-".$option;
 			}
-			else return "-".$option;
 		}
 		return $option;
 	}
 
-	private function _acceptsArgument($option) {
-	
-	
-		if($this->_isOption($option)) {
-			$Option = $this->_getOption($option);
-			foreach($Option as $option) {
-				if(isset($option['accepts_argument'])) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	private function _requiresArgument($option) {
-
-		if($this->_isOption($option)) {
-			$Option = $this->_getOption($option);
-			foreach($Option as $option) {
-				if(isset($option['requires_argument'])) {
-					return true;
-				}
-			}
-		}
-		return false;
-		
-	}
-
 	public function parse() {
 
-		foreach($this->_normalize() as $token) {
+		$this->_normalize();
+		foreach($this->_normalized as $key => $token) {
 
-			if($token === '--help') {
-				$this->_help();
-				die();
+			if($this->_looksLikeOption($token) && !$this->_isOption($token)) {
+				echo "Error:  $token is not a valid option\n";
+				continue;
+			 
+				// @todo handle errors with message + auto-gen help page
 			}
 
-			if($this->_isOption($token)) {
-				$this->_setOptionSelected($token);
-			} else {
-				$this->_setArgument($token);
+			if(isset($previous) && $this->_requiresArgument($previous)) {
+			
+				$this->_setOptArg($previous, $token);
+				$flag = 1;
 			}
-			if(isset($previous) && $this->_acceptsArgument($previous)) {
+
+			if(isset($previous) && $this->_acceptsArgument($previous) && !$this->_isOption($token)) {
+
+				$this->_setOptArg($previous, $token);
+			}
 	
-				// if it accepts AND REQUIRES argument, set whatever token is after previous as it's optArg, regardless
-				// and unset it as a SCRIPT argument
-				if($this->_requiresArgument($previous)) {
-					$this->_setOptArg($previous, $token);
-					$this->_unSetArgument($token);
-				}
+			if($this->_isOption($token)) {
 
-				// if it merely ACCEPTS OPTIONAL argument, set next token as the optArg only if it itself, is NOT an option
-				// and unset it as a SCRIPT argument
-				if(!$this->_isOption($token)) {
-					$this->_setOptArg($previous, $token);
-					$this->_unSetArgument($token);
+				$this->_setSelected($token);
+				if($this->_repeats($token)) {
+					$this->_incrementRepeats($token);
 				}
 			}
-			if($this->_repeats($token)) {
-				$option = $token;
-				$this->_incrementRepeatsFor($option);
-			}
+
 			$previous = $token;
 		}
-
 	}
 }
+
+$Options = new Options($argv);
+
+$Options->add('-f')
+	->acceptsArgument();
+$Options->add('--longopt')
+	->acceptsArgument();
+$Options->add('-p')
+	->requiresArgument();
+$Options->add('--verbose')
+	->alias('-v')
+	->repeats();
+$Options->parse();
+
+print_r($Options);
 
 ?>
