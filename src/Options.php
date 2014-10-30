@@ -1,5 +1,7 @@
 <?php
 
+namespace Optopus;
+
 class Options
 {
 
@@ -9,9 +11,9 @@ class Options
 		$this->given = $argv;
 	}
 
-	protected function _isCluster($tokens) {
+	protected function _isCluster($token) {
 
-		if($tokens[0] == "-" && $tokens[1] !== "-" && strlen($tokens) > 2) {
+		if($token[0] == "-" && $token[1] !== "-" && strlen($token) > 2) {
 			return true;
 		}
 		return false;
@@ -78,17 +80,44 @@ class Options
 
 	protected function _acceptsArgument($option) {
 
-		if(isset($this->options[$option]) && array_key_exists('accepts_argument', $this->options[$option])) {
-			return true;
+		if($Option = $this->_getOption($option)) {
+			foreach($Option as $name => $value) {
+				if(isset($this->options[$name]['accepts_argument'])) {
+					return true;
+				}
+			}
 		}
 		return false;
+	}
+	
+	protected function _setSelected($option) {
+
+		if($Option = $this->_getOption($option)) {
+			foreach($Option as $name => $value) {
+				$this->options[$name]['selected'] = true;
+			}
+		}
+	}
+
+	protected function _unSetSelected($option) {
+
+		if($Option = $this->_getOption($option)) {
+			foreach($Option as $name => $value) {
+				$this->options[$name]['selected'] = false;
+			}
+		}
 	}
 
 	protected function _requiresArgument($option) {
 
-		if(isset($this->options[$option]) && array_key_exists('requires_argument', $this->options[$option])) {
-			return true;
+		if($Option = $this->_getOption($option)) {
+			foreach($Option as $name => $value) {
+				if(isset($this->options[$name]['requires_argument'])) {
+					return true;
+				}
+			}
 		}
+
 		return false;
 	}
 
@@ -121,6 +150,9 @@ class Options
 						$result[] = $arg;
 					}
 					break;
+				} else {
+					$result[] = "-".$opt;
+
 				}
 			} else {
 				$result[] = "-".$opt;
@@ -192,19 +224,13 @@ class Options
 
 	protected function _setOptArg($option, $arg) {
 
-		$Option = $this->_getOption($option);
-		foreach($Option as $name => $value) {
-			$this->options[$name]['arg'] = $arg;
+		if($Option = $this->_getOption($option)) {
+			foreach($Option as $name => $value) {
+				$this->options[$name]['arg'] = $arg;
+			}
 		}
 	}
 
-	protected function _setSelected($option) {
-
-		$Option = $this->_getOption($option);
-		foreach($Option as $name => $value) {
-			$this->options[$name]['selected'] = true;
-		}
-	}
 
 	protected function _incrementRepeats($option) {
 
@@ -216,10 +242,11 @@ class Options
 
 	protected function _repeats($option) {
 
-		$Option = $this->_getOption($option);
-		foreach($Option as $name => $value) {
-			if(isset($this->options[$name]['repeats'])) {
-				return true;
+		if($Option = $this->_getOption($option)) {
+			foreach($Option as $name => $value) {
+				if(isset($this->options[$name]['repeats'])) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -233,7 +260,7 @@ class Options
 					$this->_normalized[] = $dtoken;	
 				}
 			} else {
-				if(strstr($token, "=")) {
+				if(strstr($token, "=") && $this->_looksLikeOption($token)) {
 					list($opt, $arg) = explode("=", $token);
 					$this->_normalized[] = $opt;
 					$this->_normalized[] = $arg;
@@ -262,49 +289,33 @@ class Options
 		foreach($this->_normalized as $key => $token) {
 
 			if($this->_looksLikeOption($token) && !$this->_isOption($token)) {
-				echo "Error:  $token is not a valid option\n";
-				continue;
-			 
-				// @todo handle errors with message + auto-gen help page
-			}
-
-			if(isset($previous) && $this->_requiresArgument($previous)) {
-			
-				$this->_setOptArg($previous, $token);
-				$flag = 1;
-			}
-
-			if(isset($previous) && $this->_acceptsArgument($previous) && !$this->_isOption($token)) {
-
-				$this->_setOptArg($previous, $token);
-			}
-	
-			if($this->_isOption($token)) {
-
+				if(isset($previous) && $this->acceptsArgument($previous)) {
+					$this->_setOptArg($previous, $token);
+				} else {
+					echo "Error: $token is not an option\n";
+					continue;
+				}
+			} else {
+				// it looks like an option and it is an option
 				$this->_setSelected($token);
 				if($this->_repeats($token)) {
 					$this->_incrementRepeats($token);
 				}
 			}
 
+			if(isset($previous) && $this->_requiresArgument($previous)) {
+				$this->_setOptArg($previous, $token);	
+				$this->_unSetSelected($token);
+			}
+
+			if(isset($previous) && $this->_acceptsArgument($previous) && !$this->_isOption($token)) {
+				$this->_setOptArg($previous, $token);
+				$this->_unSetSelected($token);
+			}
+
 			$previous = $token;
 		}
 	}
 }
-
-$Options = new Options($argv);
-
-$Options->add('-f')
-	->acceptsArgument();
-$Options->add('--longopt')
-	->acceptsArgument();
-$Options->add('-p')
-	->requiresArgument();
-$Options->add('--verbose')
-	->alias('-v')
-	->repeats();
-$Options->parse();
-
-print_r($Options);
 
 ?>

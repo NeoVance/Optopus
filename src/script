@@ -8,42 +8,37 @@ use Optopus\Options;
 
 $options = new Options($argv);
 
-$options->title('Does some cool things');
-
 $options->add('--foo')
 	->alias('-f')
+	->requiresArgument();
+
+$options->add('--bar')
+	->alias('-b')
 	->acceptsArgument();
 
-	$options->add('--bar')
-		->alias('-b')
-		->acceptsArgument()
-		->description('Bar.  Add description here.');
+$options->add('--baz')
+	->alias('-z')
+	->acceptsArgument('required');
 
-	
-	$options->add('--baz')
-		->alias('-z')
-		->acceptsArgument('required');
+$options->add('--quux')
+	->alias('-q')
+	->acceptsArgument();
 
-	$options->add('--quux')
-		->alias('-q')
-		->acceptsArgument();
+$options->add('--waldo')
+	->alias('-w')
+	->acceptsArgument();
 
-	$options->add('--waldo')
-		->alias('-w')
-		->acceptsArgument();
+$options->add('--corge')
+	->alias('-c')
+	->acceptsArgument()
+	->required();
 
-	$options->add('--corge')
-		->alias('-c')
-		->acceptsArgument()
-		->required();
+$options->add('--verbose')
+	->alias('-v')
+	->repeats();
 
-	$options->add('--verbose')
-		->alias('-v')
-		->repeats()
-		->description('Verbosity.  Add more to amplify. ie: -vvvvvv');
-
-	$options->add('--kablammo')
-		->alias('-k');
+$options->add('--kablammo')
+	->alias('-k');
 
 $options->parse();
 
