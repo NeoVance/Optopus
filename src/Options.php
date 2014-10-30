@@ -288,29 +288,33 @@ class Options
 		$this->_normalize();
 		foreach($this->_normalized as $key => $token) {
 
-			if($this->_looksLikeOption($token) && !$this->_isOption($token)) {
-				if(isset($previous) && $this->acceptsArgument($previous)) {
-					$this->_setOptArg($previous, $token);
+			if($this->_looksLikeOption($token)) {
+				if(!$this->_isOption($token)) {
+					if(isset($previous) && $this->_acceptsArgument($previous)) {
+						$this->_setOptArg($previous, $token);
+					} else {
+						// this looks like an option but it's not
+						echo "Error: $token is not an option\n";
+						continue;
+						// @todo - help page here
+					}
 				} else {
-					echo "Error: $token is not an option\n";
-					continue;
+					// it looks like an option and it is an option
+					$this->_setSelected($token);
+					if($this->_repeats($token)) {
+						$this->_incrementRepeats($token);
+					}
 				}
-			} else {
-				// it looks like an option and it is an option
-				$this->_setSelected($token);
-				if($this->_repeats($token)) {
-					$this->_incrementRepeats($token);
-				}
-			}
-
-			if(isset($previous) && $this->_requiresArgument($previous)) {
+			} elseif(isset($previous) && $this->_requiresArgument($previous)) {
 				$this->_setOptArg($previous, $token);	
 				$this->_unSetSelected($token);
-			}
-
-			if(isset($previous) && $this->_acceptsArgument($previous) && !$this->_isOption($token)) {
+			} elseif(isset($previous) && $this->_acceptsArgument($previous) && !$this->_isOption($token)) {
 				$this->_setOptArg($previous, $token);
 				$this->_unSetSelected($token);
+			} else {
+
+				// then it must be a script argument
+				$this->arguments[] = $token;
 			}
 
 			$previous = $token;
