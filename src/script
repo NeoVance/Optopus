@@ -18,7 +18,7 @@ $options->add('--bar')
 
 $options->add('--baz')
 	->alias('-z')
-	->acceptsArgument('required');
+	->acceptsArgument();
 
 $options->add('--quux')
 	->alias('-q')

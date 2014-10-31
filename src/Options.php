@@ -5,6 +5,12 @@ namespace Optopus;
 class Options
 {
 
+	public $options = [
+
+		"--" => [],
+		"--help" => [],
+	];
+
 	public function __construct($argv) {
 		
 		$this->script = array_shift($argv);
@@ -287,6 +293,23 @@ class Options
 
 		$this->_normalize();
 		foreach($this->_normalized as $key => $token) {
+
+			// the only time end-of-options can not be honored is if previous option requires an argument
+			// in which case "--" will be it's argument
+
+			if(isset($end_of_options)) {
+				if(isset($previous) && $this->_requiresArgument($previous)) {
+					$this->_setOptArg($previous, $token);	
+					$this->_unSetSelected("--");
+				}
+				$this->arguments[] = $token;
+				continue;
+			}
+
+			if($token === "--") {
+				$end_of_options = true;
+				$this->_setSelected($token);
+			}
 
 			if($this->_looksLikeOption($token)) {
 				if(!$this->_isOption($token)) {
