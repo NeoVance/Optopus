@@ -256,16 +256,22 @@ class Options
 		return $this;
 	}
 
-	protected function _help() {
+	protected function _help($option = null) {
 
 		$title = isset($this->title) ? $this->title : $this->script;
 		echo PHP_EOL.$title.PHP_EOL.PHP_EOL;
 
+		// user has overridden our baked in help
 		if(isset($this->help)) {
-
 			echo $this->help;
 		} else {
-			foreach($this->options as $option => $array) {
+			if(isset($option)) {
+				$options = $this->_getOption($option);
+			} else {
+				$options = $this->options;
+			}
+
+			foreach($options as $option => $array) {
 				$aliases = '';
 				if(array_key_exists('aliases', $array)) {
 					foreach($array['aliases'] as $alias) {
@@ -317,9 +323,15 @@ class Options
 		foreach($this->given as $key => $token) {
 
 			if($token === "--help") {
-
-				$this->_help();
-				die();
+				if(isset($this->given[$key + 1])) {
+					if($this->_isOption($this->given[$key + 1])) {
+						$option = $this->given[$key + 1];
+						$this->_help($option);
+						die();
+					}
+					$this->_help();
+					die();
+				}
 			}
 
 			if($token === "--") {
