@@ -260,20 +260,33 @@ class Options
 
 	protected function _normalize() {
 
+		$end_of_options = false;
 		foreach($this->given as $key => $token) {
-			if($this->_isCluster($token)) {
-				foreach($this->_deCluster($token) as $dtoken) {
-					$this->_normalized[] = $dtoken;	
-				}
-			} else {
-				if(strstr($token, "=") && $this->_looksLikeOption($token)) {
-					list($opt, $arg) = explode("=", $token);
-					$this->_normalized[] = $opt;
-					$this->_normalized[] = $arg;
-				} else {
-					$this->_normalized[] = $token;
+
+			if($token === "--") {
+				if(!isset($previous) || !$this->_requiresArgument($previous)) {
+					$end_of_options = true;
 				}
 			}
+			
+			if(!$end_of_options) {
+				if($this->_isCluster($token)) {
+					foreach($this->_deCluster($token) as $dtoken) {
+						$this->_normalized[] = $dtoken;	
+					}
+				} else {
+					if(strstr($token, "=") && $this->_looksLikeOption($token)) {
+						list($opt, $arg) = explode("=", $token);
+						$this->_normalized[] = $opt;
+						$this->_normalized[] = $arg;
+					} else {
+						$this->_normalized[] = $token;
+					}
+				}
+			} else {
+				$this->_normalized[] = $token;
+			}
+			$previous = $token;
 		}
 	}
 
@@ -291,56 +304,61 @@ class Options
 
 	public function parse() {
 
+		$end_of_options = false;
 		$this->_normalize();
 		foreach($this->_normalized as $key => $token) {
 
-			// the only time end-of-options can not be honored is if previous option requires an argument
-			// in which case "--" will be it's argument
-
-			if(isset($end_of_options)) {
-				if(isset($previous) && $this->_requiresArgument($previous)) {
-					$this->_setOptArg($previous, $token);	
-					$this->_unSetSelected("--");
-				}
-				$this->arguments[] = $token;
-				continue;
-			}
-
 			if($token === "--") {
-				$end_of_options = true;
-				$this->_setSelected($token);
-			}
-
-			if($this->_looksLikeOption($token)) {
-				if(!$this->_isOption($token)) {
-					if(isset($previous) && $this->_acceptsArgument($previous)) {
-						$this->_setOptArg($previous, $token);
-					} else {
-						// this looks like an option but it's not
-						echo "Error: $token is not an option\n";
-						continue;
-						// @todo - help page here
-					}
-				} else {
-					// it looks like an option and it is an option
+				if(!isset($previous) || !$this->_requiresArgument($previous)) {
+					$end_of_options = true;
 					$this->_setSelected($token);
-					if($this->_repeats($token)) {
-						$this->_incrementRepeats($token);
-					}
 				}
-			} elseif(isset($previous) && $this->_requiresArgument($previous)) {
-				$this->_setOptArg($previous, $token);	
-				$this->_unSetSelected($token);
-			} elseif(isset($previous) && $this->_acceptsArgument($previous) && !$this->_isOption($token)) {
-				$this->_setOptArg($previous, $token);
-				$this->_unSetSelected($token);
-			} else {
+			}
+			
+			if(!$end_of_options) {
+				if($this->_looksLikeOption($token)) {
+					if(!$this->_isOption($token)) {
+						if(isset($previous) && $this->_acceptsArgument($previous)) {
+							$this->_setOptArg($previous, $token);
+						} else {
+							// this looks like an option but it's not
+							echo "Error: $token is not an option\n";
+							continue;
+							// @todo - help page here
+						}
+					} else {
+						// it looks like an option and it is an option
+						$this->_setSelected($token);
+						if($this->_repeats($token)) {
+							$this->_incrementRepeats($token);
+						}
+					}
+				} elseif(isset($previous) && $this->_requiresArgument($previous)) {
+					$this->_setOptArg($previous, $token);	
+					$this->_unSetSelected($token);
+				} elseif(isset($previous) && $this->_acceptsArgument($previous) && !$this->_isOption($token)) {
+					$this->_setOptArg($previous, $token);
+					$this->_unSetSelected($token);
+				} else {
 
-				// then it must be a script argument
+					// then it must be a script argument
+					$this->arguments[] = $token;
+				}
+			} else {
 				$this->arguments[] = $token;
 			}
-
 			$previous = $token;
+		}
+		// @todo - changing loop logic will remove need for this
+		// it unsets the first occurance of "--" as a script argument since it should not be
+		if($end_of_options) {
+			foreach($this->arguments as $key => $argument) {
+				if($argument === "--") {
+					unset($this->arguments[$key]);
+					$this->arguments = array_values($this->arguments);
+					break;
+				}
+			}	
 		}
 	}
 }
