@@ -333,7 +333,8 @@ class Options
 							$this->_incrementRepeats($token);
 						}
 					}
-				} elseif(isset($previous) && $this->_requiresArgument($previous)) {
+				}
+				if(isset($previous) && $this->_requiresArgument($previous)) {
 					$this->_setOptArg($previous, $token);	
 					$this->_unSetSelected($token);
 				} elseif(isset($previous) && $this->_acceptsArgument($previous) && !$this->_isOption($token)) {
@@ -341,8 +342,10 @@ class Options
 					$this->_unSetSelected($token);
 				} else {
 
-					// then it must be a script argument
-					$this->arguments[] = $token;
+					if(!$this->_isOption($token)) {
+						// then it must be a script argument
+						$this->arguments[] = $token;
+					}
 				}
 			} else {
 				$this->arguments[] = $token;
