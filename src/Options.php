@@ -7,8 +7,12 @@ class Options
 
 	public $options = [
 
-		"--" => [],
-		"--help" => [],
+		"--" => [
+				'description' => 'End of Options.  If this is used, no options after it will be parsed unless the preceeding option requires an argument'
+			],
+		"--help" => [
+				'description' => 'This help page.'
+			],
 	];
 
 	public function __construct($argv) {
@@ -228,6 +232,55 @@ class Options
 		return $this;
 	}
 
+	public function description($desc = null) {
+
+		$this->options[$this->_current_option]['description'] = $desc;
+		return $this;
+	}
+
+	public function help($help) {
+
+		if(isset($help)) {
+			$this->help = $help;
+		}
+		return $this;
+	}
+
+	public function title($title) {
+
+		// defaults to script name in help
+
+		if(isset($title)) {
+			$this->title = $title;
+		}
+		return $this;
+	}
+
+	protected function _help() {
+
+		$title = isset($this->title) ? $this->title : $this->script;
+		echo PHP_EOL.$title.PHP_EOL.PHP_EOL;
+
+		if(isset($this->help)) {
+
+			echo $this->help;
+		} else {
+			foreach($this->options as $option => $array) {
+				$aliases = '';
+				if(array_key_exists('aliases', $array)) {
+					foreach($array['aliases'] as $alias) {
+						$aliases .= "|".$alias;
+					}
+				}
+
+				$description = isset($array['description']) ? $array['description'] : "No description available.";
+				echo "  ".$option.$aliases.PHP_EOL;
+				echo "     ".$description.PHP_EOL.PHP_EOL;
+			}
+			echo PHP_EOL;
+		}
+	}
+
 	protected function _setOptArg($option, $arg) {
 
 		if($Option = $this->_getOption($option)) {
@@ -262,6 +315,12 @@ class Options
 
 		$end_of_options = false;
 		foreach($this->given as $key => $token) {
+
+			if($token === "--help") {
+
+				$this->_help();
+				die();
+			}
 
 			if($token === "--") {
 				if(!isset($previous) || !$this->_requiresArgument($previous)) {

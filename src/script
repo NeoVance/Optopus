@@ -10,7 +10,8 @@ $options = new Options($argv);
 
 $options->add('--foo')
 	->alias('-f')
-	->requiresArgument();
+	->requiresArgument()
+	->description('Foo.  does foo things');
 
 $options->add('--bar')
 	->alias('-b')
@@ -40,6 +41,7 @@ $options->add('--verbose')
 $options->add('--kablammo')
 	->alias('-k');
 
+$options->title("./foobar -- Does some things");
 $options->parse();
 
 print_r($options);
