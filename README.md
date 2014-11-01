@@ -81,6 +81,17 @@ Will produce an arg of `abc` for `-r`
 
 Will produce an arg of `Foo` for `-r`
 
+### Repeating Options
+Useful mostly for debug / verbosity options, for example:
+```php
+$options->add('--verbose')
+  ->alias('-v')
+  ->repeats()
+  ->description('Verbosity.  You can amplify by adding again ie: -vvv or -v -v or --verbose --verbose');
+```
+
+The `repeat_count` will be set for the option in the returned options Object.
+
 
 ### End of Options and Help Page
 Supports `--` for end-of-options GNU pseudo-standard
