@@ -256,6 +256,41 @@ class Options
 		return $this;
 	}
 
+	public function all($type = 'both') {
+
+		$type = strtolower($type);
+
+		foreach($this->options as $option => $array) {
+			if(!strstr('alias', $type)) {
+				$all[] = $option;
+			}
+			if(!strstr('option', $type)) {
+				if(array_key_exists('aliases', $array)) {
+					foreach($array['aliases'] as $alias) {
+						$all[] = $alias;
+					}
+				} 
+			}
+		}
+		return $all;
+	}
+
+	protected function _guessOption($given) {
+
+		$options = $this->all();
+		foreach($options as $option) {
+			$lev = levenshtein($given, $option);
+			if(!isset($floor)) {
+				$floor = $lev;
+			}
+			if($lev <= $floor) {
+				$floor = $lev;
+				$best_guess = $option;
+			}
+		}
+		return $best_guess;
+	}
+
 	protected function _help($option = null) {
 
 		$title = isset($this->title) ? $this->title : $this->script;
@@ -266,7 +301,13 @@ class Options
 			echo $this->help;
 		} else {
 			if(isset($option)) {
-				$options = $this->_getOption($option);
+				if(!$options = $this->_getOption($option)) {
+
+					// it looked like an option but it isn't one
+					$guess = $this->_guessOption($option);
+					echo "  Unknown option $option .  Did you mean $guess ? Try --help by itself to see a full help page.\n\n";
+					$options = $this->_getOption($guess);
+				}
 			} else {
 				$options = $this->options;
 			}
@@ -324,14 +365,12 @@ class Options
 
 			if($token === "--help") {
 				if(isset($this->given[$key + 1])) {
-					if($this->_isOption($this->given[$key + 1])) {
-						$option = $this->given[$key + 1];
-						$this->_help($option);
-						die();
-					}
-					$this->_help();
+					$with = $this->given[$key + 1];
+					$this->_help($with);
 					die();
 				}
+				$this->_help();
+				die();
 			}
 
 			if($token === "--") {
@@ -393,9 +432,8 @@ class Options
 							$this->_setOptArg($previous, $token);
 						} else {
 							// this looks like an option but it's not
-							echo "Error: $token is not an option\n";
-							continue;
-							// @todo - help page here
+							$this->_help($token);
+							die();
 						}
 					} else {
 						// it looks like an option and it is an option
