@@ -296,21 +296,23 @@ class Options
 		$title = isset($this->title) ? $this->title : $this->script;
 		echo PHP_EOL.$title.PHP_EOL.PHP_EOL;
 
+		if(isset($option)) {
+			if(!$options = $this->_getOption($option)) {
+
+				// it looked like an option but it isn't one
+				$guess = $this->_guessOption($option);
+				echo "  Unknown option $option .  Did you mean $guess ? Try --help by itself to see a full help page.\n\n";
+				$options = $this->_getOption($guess);
+			}
+		} else {
+			// all
+			$options = $this->options;
+		}
+	
 		// user has overridden our baked in help
 		if(isset($this->help)) {
 			echo $this->help;
 		} else {
-			if(isset($option)) {
-				if(!$options = $this->_getOption($option)) {
-
-					// it looked like an option but it isn't one
-					$guess = $this->_guessOption($option);
-					echo "  Unknown option $option .  Did you mean $guess ? Try --help by itself to see a full help page.\n\n";
-					$options = $this->_getOption($guess);
-				}
-			} else {
-				$options = $this->options;
-			}
 
 			foreach($options as $option => $array) {
 				$aliases = '';
