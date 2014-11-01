@@ -171,7 +171,6 @@ class Options
 		return $result;
 	}
 
-	// Option construction methods
 
 	private function _prohibited($option) {
 
@@ -182,97 +181,6 @@ class Options
 			return true;
 		}
 		return false;
-	}
-
-	public function add($option) {
-
-		if($this->_prohibited($option)) {
-			throw new Exception("Attmepted to add prohibited option $option");
-			// @todo friendlier error handling here
-		}
-
-		$this->_current_option = $option;
-		$this->options[$option] = [];
-		return $this;
-	}
-
-	public function alias($alias) {
-
-		if($this->_prohibited($alias)) {
-			throw new Exception("Attmepted to add prohibited option $alias");
-		}
-
-		$this->options[$this->_current_option]['aliases'][] = $alias;
-		return $this;
-	}
-
-	public function required() {
-
-		$this->options[$this->_current_option]['required'] = true;
-		return $this;
-	}
-
-	public function acceptsArgument() {
-
-		$this->options[$this->_current_option]['accepts_argument'] = true;
-		return $this;
-	}
-
-	public function requiresArgument() {
-
-		$this->options[$this->_current_option]['accepts_argument'] = true;
-		$this->options[$this->_current_option]['requires_argument'] = true;
-		return $this;
-	}
-
-	public function repeats() {
-
-		$this->options[$this->_current_option]['repeats'] = true;
-		$this->options[$this->_current_option]['repeat_count'] = 0;
-		return $this;
-	}
-
-	public function description($desc = null) {
-
-		$this->options[$this->_current_option]['description'] = $desc;
-		return $this;
-	}
-
-	public function help($help) {
-
-		if(isset($help)) {
-			$this->help = $help;
-		}
-		return $this;
-	}
-
-	public function title($title) {
-
-		// defaults to script name in help
-
-		if(isset($title)) {
-			$this->title = $title;
-		}
-		return $this;
-	}
-
-	public function all($type = 'both') {
-
-		$type = strtolower($type);
-
-		foreach($this->options as $option => $array) {
-			if(!strstr('alias', $type)) {
-				$all[] = $option;
-			}
-			if(!strstr('option', $type)) {
-				if(array_key_exists('aliases', $array)) {
-					foreach($array['aliases'] as $alias) {
-						$all[] = $alias;
-					}
-				} 
-			}
-		}
-		return $all;
 	}
 
 	protected function _guessOption($given) {
@@ -413,6 +321,177 @@ class Options
 		}
 		return $option;
 	}
+
+	// Public Option construction methods
+	public function add($option) {
+
+		$option = isset($option) ? $this->_addDashes($option) : null;
+
+		if($this->_prohibited($option)) {
+			throw new Exception("Attmepted to add prohibited option $option");
+			// @todo friendlier error handling here
+		}
+
+		$this->_current_option = $option;
+		$this->options[$option] = [];
+		return $this;
+	}
+
+	public function alias($alias) {
+
+		$alias = isset($alias) ? $this->_addDashes($alias) : null;
+
+		if($this->_prohibited($alias)) {
+			throw new Exception("Attmepted to add prohibited option $alias");
+		}
+
+		$this->options[$this->_current_option]['aliases'][] = $alias;
+		return $this;
+	}
+
+	public function required() {
+
+		$this->options[$this->_current_option]['required'] = true;
+		return $this;
+	}
+
+	public function acceptsArgument() {
+
+		$this->options[$this->_current_option]['accepts_argument'] = true;
+		return $this;
+	}
+
+	public function requiresArgument() {
+
+		$this->options[$this->_current_option]['accepts_argument'] = true;
+		$this->options[$this->_current_option]['requires_argument'] = true;
+		return $this;
+	}
+
+	public function repeats() {
+
+		$this->options[$this->_current_option]['repeats'] = true;
+		$this->options[$this->_current_option]['repeat_count'] = 0;
+		return $this;
+	}
+
+	public function description($desc = null) {
+
+		$this->options[$this->_current_option]['description'] = $desc;
+		return $this;
+	}
+
+	public function help($help) {
+
+		if(isset($help)) {
+			$this->help = $help;
+		}
+		return $this;
+	}
+
+	public function title($title) {
+
+		// defaults to script name in help
+
+		if(isset($title)) {
+			$this->title = $title;
+		}
+		return $this;
+	}
+
+	// Public getters
+	public function all($type = 'both') {
+
+		$type = strtolower($type);
+
+		foreach($this->options as $option => $array) {
+			if(!strstr('alias', $type)) {
+				$all[] = $option;
+			}
+			if(!strstr('option', $type)) {
+				if(array_key_exists('aliases', $array)) {
+					foreach($array['aliases'] as $alias) {
+						$all[] = $alias;
+					}
+				} 
+			}
+		}
+		return $all;
+	}
+
+	public function get($option = null) {
+
+		if(isset($option)) {
+			$option = $this->_addDashes($option);
+			return $this->_getOption($option);
+		}
+		return $this->options;
+	}
+	
+	public function getSelected() {
+
+		$selected = [];
+		foreach($this->options as $option => $array) {
+			if(isset($array['selected']) && $array['selected']) {
+				$selected[] = $option;
+			}
+		}
+		return $selected;
+	}
+
+	public function getOptArg($option = null) {
+
+		$option = isset($option) ? $this->_addDashes($option) : null;
+
+		$optargs = [];
+		if(isset($option)) {
+			$Option = $this->_getOption($option);
+			foreach($Option as $name => $array) {
+				if(isset($array['arg']) && !empty($array['arg'])) {
+					$optargs[$name] = $array['arg'];
+				}
+			}
+		} else {
+			foreach($this->options as $option => $array) {
+				if(isset($array['arg']) && !empty($array['arg'])) {
+					$optargs[$option] = $array['arg'];
+				}
+			}
+		}
+		return $optargs;
+	}
+	
+	public function getRepeatCount($option) {
+	
+		if(isset($option)) {
+			$option = $this->get($this->_addDashes($option));
+			foreach($this->options as $option => $array) {
+				if(isset($array['repeat_count'])) {
+					return $array['repeat_count'];
+				}
+			}
+		}
+		return null;
+	}
+
+	// Some magic for 'fuzzy calling' public getter methods
+	// ie: getRepeatCount() 
+
+	public function __call($name, $arguments) {
+
+		$arguments = empty($arguments) ? null : implode(', ', $arguments);
+
+		if(preg_match('/repeatcount/i', $name)) {
+			return $this->getRepeatCount($arguments);
+		}
+		if(preg_match('/opt_?arg/i', $name)) {
+			return $this->getOptArg($arguments);
+		}
+		if(preg_match('/selected/i', $name)) {
+			return $this->getSelected();
+		}
+	}
+
 
 	public function parse() {
 
