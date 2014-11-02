@@ -474,6 +474,13 @@ class Options
 		return null;
 	}
 
+	public function getArguments() {
+
+		// script arguments - not options, not option arguments
+		$arguments = isset($this->arguments) ? $this->arguments : null;
+		return $arguments;
+	}
+
 	// Some magic for 'fuzzy calling' public getter methods
 	// ie: getRepeatCount() 
 
@@ -484,11 +491,14 @@ class Options
 		if(preg_match('/repeatcount/i', $name)) {
 			return $this->getRepeatCount($arguments);
 		}
-		if(preg_match('/opt_?arg/i', $name)) {
+		if(preg_match('/optargs?/i', $name)) {
 			return $this->getOptArg($arguments);
 		}
 		if(preg_match('/selected/i', $name)) {
 			return $this->getSelected();
+		}
+		if(preg_match('/(args|arguments)/i', $name)) {
+			return $this->getArguments();
 		}
 	}
 
