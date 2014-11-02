@@ -34,6 +34,12 @@ $options->add('--corge')
 	->acceptsArgument()
 	->required();
 
+$options->add('--xray')
+	->alias('-x');
+
+$options->add('--yellow')
+	->alias('-y');
+
 $options->add('--verbose')
 	->alias('-v')
 	->repeats();
