@@ -26,7 +26,7 @@ $options->add('--bar')
   
 $options->add('--baz')
   ->alias('-z')
-  ->acceptsArgument('required')
+  ->requiresArgument()
   ->description('Baz.  Set description here.  This option requires an additional argument.');
 
 $options->add('--verbose')
@@ -39,13 +39,58 @@ $options->parse();
 print_r($options);
 ```
 
+`parse()` must be called *after* all option creation.
+
+### Public Methods
+As seen in the example above, there exists method chaining for creating new options.  They are:
+* `add('option')`  - option can be shortopt or longopt, and specifying the dashes is optional.
+
+For example:
+
+  `add('f')`
+  
+  `add(-f')`
+  
+  `add('--foo')`
+  
+  `add('foo')`
+  
+
+* `alias('alias')`  - another name for the option.  You can make the option shortopt, and the alias longopt, vice-versa, or whatever you want.  It's invocation will be equivalent to calling the parent option.
+
+* `acceptsArgument()` - This is a rare.  You probably want `requiresArgument()`.  `acceptsArgument()` is for cases where you want the option to *optionally* accept an argument.  For an example, see GNU's `cp` option `--reflink`.  It accepts an argument, but if not given, acts as a 'flag'.  This library handles this properly if you need this type of option for your script.
+
+* `requiresArgument()` - The option requires an argument.  It can be given in various common syntaxes.  See below 'Option Arguments' section for examples.
+
+* `description($desc_string)` - Set the option description.  This is used in the baked in help.  This should be a brief description.  See public method `help()` also if you wish to override this and make your own help page.
+
+* `help($help_string)` - Override the baked in help and set the output string for the help page if options are given incorrectly, or otherwise fail the criteria you've set.
+
+* `title($title_string)` - Override the title.  This is only used in the first line of the help page, and defaults to the actual invoked script name ( `$argv[0]` ).
+
+* `repeats()` - specifies that the option should keep a count of how many times it's called.  This is useful mostly for --verbose/-v and --debug/-d/-D options typically, but use this however you like.
+
+Additional Public methods to retreive information about options:
+
+**NOTE:** Some magic is involved here via PHP's magic method `__call()`.  This is only so that you don't have to remember the exact method names to retreive information about the options and what was selected.  For example, `$options->selected()`, `$options->getSelected()`, `$options->sElecTED()` all call `$options->getSelected()`.  See the `__call()` function for more information on what's allowed.
+
+* `get($option = null)` - returns an array of options selected or an array of just the option given.
+
+* `all()` - Not sure how useful externally, but it produces an array of all available options and aliases.
+
+* `getSelected()` - Returns an array of all selected options.
+
+* `getRepeatCount($option)` - returns an integer of how many times an option has been selected.
+
+* `getOptArg($option = null)` - returns an array of option arguments indexed by the option name
+
 ### Option Arguments:
 
 Option Arguments come in two flavors:
 * Optional Option Arguments
 * Required Option Arguments
 
-Optional Option arguments are rare, but they are used in many CLI utilities.  This means that an option `accceptsArgument()` but does not `requiresArgument()`.  So if `--foo` only `acceptsArgument()` then it could be used like:
+Optional Option arguments are rare, but they are used in some CLI utilities.  This means that an option `accceptsArgument()` but does not `requiresArgument()`.  So if `--foo` only `acceptsArgument()` then it could be used like:
 
 `./script --foo`
 
