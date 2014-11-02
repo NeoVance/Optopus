@@ -147,9 +147,9 @@ Supports `--` for end-of-options GNU pseudo-standard
 `--help` will default to a help page generated from the public `description()` method.  As of now this can be overriden by calling public `help()` method, ie - `$options->help($string)` where `$string` is a full help page string.  This is only useful if you want to add a lot of custom help information for various options.
 
 
-Demo script:
+### Try it:
 
-If you'd like to give it a test, do the following:
+If you'd like to give it a test run, here's how.  It comes with a script that you can play around with.  Do the following:
 
 `git clone git@github.com:kevinquinnyo/Optopus.git`
 
