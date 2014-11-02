@@ -467,7 +467,7 @@ class Options
 			$option = $this->get($this->_addDashes($option));
 			foreach($this->options as $option => $array) {
 				if(isset($array['repeat_count'])) {
-					return $array['repeat_count'];
+					return (int)$array['repeat_count'];
 				}
 			}
 		}
