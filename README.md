@@ -153,9 +153,11 @@ If you'd like to give it a test, do the following:
 
 `git clone git@github.com:kevinquinnyo/Optopus.git`
 
-`cd Optopus/src`
+`cd Optopus/`
 
 `composer install`  (for test suite inclusion and to set PSR-4 namespace)
+
+`cd src`
 
 `chmod u+x script`
 
