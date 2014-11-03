@@ -102,8 +102,6 @@ class Options
 	
 	protected function _setSelected($option) {
 
-
-		echo "DEBUG we are setting option $option selected and it's count is\n";
 		if($Option = $this->_getOption($option)) {
 			foreach($Option as $name => $value) {
 				$this->options[$name]['selected'] = true;
