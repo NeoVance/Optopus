@@ -369,6 +369,34 @@ class Options
 		return $option;
 	}
 
+	protected function _splitLongOpt($token) {
+
+		// break it into array and read by char to allow --corgeCorge if --corge accepts or requires argument
+		// @todo - consider throwing an exception / error / hint in the edge-case scenario that --corgeCorge is actually an option !
+
+		$splitToken = str_split($token);
+		$arg = '';
+
+		// remove "--" to avoid false-positive on "--" end-of-options
+		unset($splitToken[0]);
+		unset($splitToken[1]);
+
+		foreach($splitToken as $char) {
+			if(isset($opt)) {
+				$arg .= $char;
+				continue;
+			}
+			$maybe_option .= $char;
+			if($this->_isOption("--".$maybe_option)) {
+				$opt = "--".$maybe_option;
+			}
+		}
+		if(isset($opt)) {
+			return ['opt' => $opt, 'arg' => $arg];
+		}
+		return false;
+	}
+
 	// Public Option construction methods
 	public function add($option) {
 
@@ -580,12 +608,22 @@ class Options
 			
 			if(!$end_of_options) {
 				if($this->_looksLikeOption($token)) {
+					
 					if(!$this->_isOption($token)) {
 						if(isset($previous) && $this->_acceptsArgument($previous)) {
 							$this->_setOptArg($previous, $token);
 						} else {
 							// this looks like an option but it's not
-							$this->_help($token, 1);
+							// let's see if it's something like --corgeCorge where --corge is opt and Corge is arg
+							if($optarg = $this->_splitLongOpt($token)) {
+								$this->_setSelected($optarg['opt']);
+								if(!empty($optarg['arg'])) {
+									$this->_setOptArg($optarg['opt'], $optarg['arg']);
+								}	
+								continue;
+							} else {
+								$this->_help($token, 1);
+							}
 						}
 					} else {
 						// it looks like an option and it is an option
