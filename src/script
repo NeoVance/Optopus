@@ -38,7 +38,8 @@ $options->add('--xray')
 	->alias('-x');
 
 $options->add('--yellow')
-	->alias('-y');
+	->alias('-y')
+	->incompatibleWith(['-x']);
 
 $options->add('--verbose')
 	->alias('-v')

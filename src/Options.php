@@ -236,6 +236,7 @@ class Options
 			}
 			echo PHP_EOL;
 		}
+		die();
 	}
 
 	protected function _setOptArg($option, $arg) {
@@ -268,6 +269,49 @@ class Options
 		return false;
 	}
 
+	protected function _optionHas($property, $option) {
+		
+		$Option = $this->_getOption($option);
+		foreach($Option as $option => $array) {
+			if(isset($array[$property]) && $array[$property]) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	protected function _validate() {
+
+		foreach($this->options as $option => $array) {
+
+			// required options must be set
+			if($this->_optionHas('required', $option) && !$this->_optionHas('selected', $option)) {
+				$msgs[] = "Option $option is required but not selected.\n";
+			}
+
+			// incompatible options must not be selected together
+			if($this->_optionHas('incompatible_with', $option) && $this->_optionHas('selected', $option)) {
+				foreach($this->options[$option]['incompatible_with'] as $inc_option) {
+					if($this->_optionHas('selected', $inc_option)) {
+						$msgs[] = "Option $inc_option is incompatible with option $option\n";
+					}
+				}
+			}
+			
+			// options which require arguments must have an argument
+			if($this->_optionhas('requires_argument', $option) && $this->_optionHas('selected', $option) && !$this->_optionHas('arg', $option)) {
+				$msgs[] = "Option $option requires an argument.\n";
+			}
+		}
+		if(isset($msgs)) {
+			foreach($msgs as $msg) {
+				echo "[ERROR] ".$msg.PHP_EOL.PHP_EOL;
+			}
+			$this->_help();
+		}
+	}
+
 	protected function _normalize() {
 
 		$end_of_options = false;
@@ -277,10 +321,8 @@ class Options
 				if(isset($this->given[$key + 1])) {
 					$with = $this->given[$key + 1];
 					$this->_help($with);
-					die();
 				}
 				$this->_help();
-				die();
 			}
 
 			if($token === "--") {
@@ -396,6 +438,22 @@ class Options
 		if(isset($title)) {
 			$this->title = $title;
 		}
+		return $this;
+	}
+
+	public function incompatibleWith($options) {
+
+		if(!is_array($options)) {
+			$options = [$options];
+		}
+		foreach($options as $option) {
+			$Option = $this->_getOption($option);
+			foreach($Option as $option => $array) {
+				$inc_options[] = $option;
+			}
+		}
+
+		$this->options[$this->_current_option]['incompatible_with'] = $inc_options;
 		return $this;
 	}
 
@@ -524,7 +582,6 @@ class Options
 						} else {
 							// this looks like an option but it's not
 							$this->_help($token);
-							die();
 						}
 					} else {
 						// it looks like an option and it is an option
@@ -563,6 +620,7 @@ class Options
 				}
 			}	
 		}
+		$this->_validate();
 	}
 }
 
