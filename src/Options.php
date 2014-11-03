@@ -4,7 +4,7 @@ namespace Optopus;
 
 class Options
 {
-	public $NOHELP = true;
+	public $NOHELP = false;
 	public $options = [
 
 		"--" => [
