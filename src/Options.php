@@ -199,7 +199,7 @@ class Options
 		return $best_guess;
 	}
 
-	protected function _help($option = null) {
+	protected function _help($option = null, $err_code = 0) {
 
 		$title = isset($this->title) ? $this->title : $this->script;
 		echo PHP_EOL.$title.PHP_EOL.PHP_EOL;
@@ -236,7 +236,7 @@ class Options
 			}
 			echo PHP_EOL;
 		}
-		die();
+		die($err_code);
 	}
 
 	protected function _setOptArg($option, $arg) {
@@ -308,7 +308,7 @@ class Options
 			foreach($msgs as $msg) {
 				echo "[ERROR] ".$msg.PHP_EOL.PHP_EOL;
 			}
-			$this->_help();
+			$this->_help(null, 1);
 		}
 	}
 
@@ -320,9 +320,9 @@ class Options
 			if($token === "--help") {
 				if(isset($this->given[$key + 1])) {
 					$with = $this->given[$key + 1];
-					$this->_help($with);
+					$this->_help($with, 0);
 				}
-				$this->_help();
+				$this->_help(null, 0);
 			}
 
 			if($token === "--") {
@@ -581,7 +581,7 @@ class Options
 							$this->_setOptArg($previous, $token);
 						} else {
 							// this looks like an option but it's not
-							$this->_help($token);
+							$this->_help($token, 1);
 						}
 					} else {
 						// it looks like an option and it is an option
