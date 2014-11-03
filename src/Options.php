@@ -4,7 +4,7 @@ namespace Optopus;
 
 class Options
 {
-
+	public $NOHELP = true;
 	public $options = [
 
 		"--" => [
@@ -102,9 +102,17 @@ class Options
 	
 	protected function _setSelected($option) {
 
+
+		echo "DEBUG we are setting option $option selected and it's count is\n";
 		if($Option = $this->_getOption($option)) {
 			foreach($Option as $name => $value) {
 				$this->options[$name]['selected'] = true;
+				if(isset($this->options[$name]['count'])) {
+					$this->options[$name]['count'] += 1;
+					echo "  and we just incremented count, so it's now ".$this->options[$name]['count']."\n";
+				} else {
+					$this->options[$name]['count'] = 1;
+				}
 			}
 		}
 	}
@@ -113,7 +121,9 @@ class Options
 
 		if($Option = $this->_getOption($option)) {
 			foreach($Option as $name => $value) {
-				$this->options[$name]['selected'] = false;
+				//$this->options[$name]['selected'] = false;
+				unset($this->options[$name]['selected']);
+				$this->options[$name]['count'] -= 1;
 			}
 		}
 	}
@@ -201,6 +211,10 @@ class Options
 
 	protected function _help($option = null, $err_code = 0) {
 
+		if($this->NOHELP) {
+			return true;
+		}
+
 		$title = isset($this->title) ? $this->title : $this->script;
 		echo PHP_EOL.$title.PHP_EOL.PHP_EOL;
 
@@ -245,15 +259,6 @@ class Options
 			foreach($Option as $name => $value) {
 				$this->options[$name]['arg'] = $arg;
 			}
-		}
-	}
-
-
-	protected function _incrementRepeats($option) {
-
-		$Option = $this->_getOption($option);
-		foreach($Option as $name => $value) {
-			$this->options[$name]['repeat_count'] += 1;
 		}
 	}
 
@@ -413,7 +418,6 @@ class Options
 	public function repeats() {
 
 		$this->options[$this->_current_option]['repeats'] = true;
-		$this->options[$this->_current_option]['repeat_count'] = 0;
 		return $this;
 	}
 
@@ -519,17 +523,17 @@ class Options
 		return $optargs;
 	}
 	
-	public function getRepeatCount($option) {
+	public function getCount($option) {
 	
 		if(isset($option)) {
 			$option = $this->get($this->_addDashes($option));
 			foreach($this->options as $option => $array) {
-				if(isset($array['repeat_count'])) {
-					return (int)$array['repeat_count'];
+				if(isset($array['count'])) {
+					return (int)$array['count'];
 				}
 			}
 		}
-		return null;
+		return (int)0;
 	}
 
 	public function getArguments() {
@@ -540,14 +544,14 @@ class Options
 	}
 
 	// Some magic for 'fuzzy calling' public getter methods
-	// ie: getRepeatCount() 
+	// ie: getCount() 
 
 	public function __call($name, $arguments) {
 
 		$arguments = empty($arguments) ? null : implode(', ', $arguments);
 
-		if(preg_match('/repeatcount/i', $name)) {
-			return $this->getRepeatCount($arguments);
+		if(preg_match('/count/i', $name)) {
+			return $this->getCount($arguments);
 		}
 		if(preg_match('/optargs?/i', $name)) {
 			return $this->getOptArg($arguments);
@@ -586,14 +590,16 @@ class Options
 					} else {
 						// it looks like an option and it is an option
 						$this->_setSelected($token);
-						if($this->_repeats($token)) {
-							$this->_incrementRepeats($token);
-						}
 					}
 				}
 				if(isset($previous) && $this->_requiresArgument($previous)) {
-					$this->_setOptArg($previous, $token);	
-					$this->_unSetSelected($token);
+					$this->_setOptArg($previous, $token);
+
+					// this is so that if the argument given is an option and was previously called legitimately, we do not unset it
+					if($this->getCount($token) === 1) {
+						$this->_unSetSelected($token);
+					}
+
 				} elseif(isset($previous) && $this->_acceptsArgument($previous) && !$this->_isOption($token)) {
 					$this->_setOptArg($previous, $token);
 					$this->_unSetSelected($token);
