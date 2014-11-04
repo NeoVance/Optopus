@@ -50,7 +50,7 @@ This library allows for a lot of flexibility in end-user options usage.  The one
 Long options have two dashes and short options have one.  See the clustering section for details on short option clustering (which is of course allowed).
 
 As seen in the example above, there exists method chaining for creating new options.  They are:
-* `add('option')`  - option can be shortopt or longopt, and specifying the dashes is optional.
+* `add('option')`  - option can be shortopt or longopt, and specifying the dashes here is optional.
 
   For example:
 ```
