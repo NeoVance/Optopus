@@ -89,6 +89,8 @@ These are not chained methods. They should be called just before `parse()`.  The
 
 These methods are available for you to see what was selected, how many times it was selected, what arguments were provided, what option arguments were provided, etc.  They are what you will use in your script to determine what to do, based on the user-supplied options.
 
+**NOTE** These are just convenience methods.  If you prefer, you can just parse `$options` yourself to determine what was selected, validate option arguments, etc
+
 **NOTE:** Some magic is involved here via PHP's magic method `__call()`.  This is only so that you don't have to remember the exact method names to retreive information about the options and what was selected.  For example, `$options->selected()`, `$options->getSelected()`, `$options->sElecTED()` all call `$options->getSelected()`.  See the `__call()` function for more information on what's allowed.
 
 * `get($option = null)` - returns an array of options selected or an array of just the option given.
