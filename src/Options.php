@@ -158,7 +158,9 @@ class Options
 			// if it only accepts arg, everything after is arg unless next is also an option
 			if($this->_acceptsArgument("-".$opt)) {
 				if(isset($declustered[$key + 1]) && !$this->_isOption("-".$declustered[$key + 1]) || isset($flag)) {
-					$arg = !empty(implode('', array_slice($declustered, $key + 1))) ? implode('', array_slice($declustered, $key + 1)) : null;
+					$arg = implode('', array_slice($declustered, $key + 1));
+					$arg = !empty($arg) ? $arg : null;
+					//$arg = !empty(implode('', array_slice($declustered, $key + 1))) ? implode('', array_slice($declustered, $key + 1)) : null;
 					if($arg[0] === "=") {
 						$arg = substr($arg, 1);
 					}
@@ -362,6 +364,7 @@ class Options
 
 		$splitToken = str_split($token);
 		$arg = '';
+		$maybe_option = '';
 
 		// remove "--" to avoid false-positive on "--" end-of-options
 		unset($splitToken[0]);
