@@ -34,7 +34,6 @@ $options->add('--baz')
 
 $options->add('--verbose')
   ->alias('-v')
-  ->repeats()
   ->description('Verbosity.  You can amplify by adding again ie: -vvv or -v -v or --verbose --verbose');
   
 $options->parse();
@@ -70,8 +69,6 @@ For example:
 * `help($help_string)` - Override the baked in help and set the output string for the help page if options are given incorrectly, or otherwise fail the criteria you've set.
 
 * `title($title_string)` - Override the title.  This is only used in the first line of the help page, and defaults to the actual invoked script name ( `$argv[0]` ).
-
-* `repeats()` - specifies that the option should keep a count of how many times it's called.  This is useful mostly for --verbose/-v and --debug/-d/-D options typically, but use this however you like.
 
 * `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given bu end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
 
@@ -133,14 +130,14 @@ Will produce an arg of `Foo` for `-r`
 
 ### Repeating Options
 Useful mostly for debug / verbosity options, for example:
+
 ```php
 $options->add('--verbose')
   ->alias('-v')
-  ->repeats()
   ->description('Verbosity.  You can amplify by adding again ie: -vvv or -v -v or --verbose --verbose');
 ```
 
-The `count` will be set for the option in the returned options Object.
+The `count` will be incremented for any option selected in the returned options Object.
 
 
 ### End of Options and Help Page
