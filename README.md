@@ -166,7 +166,7 @@ Supports `--` for end-of-options GNU pseudo-standard
 
 ### Arguments
 
-Script arguments are indexed properly, in the order they were received.  They are set to an array `arguments` of the Optopus object.  This allows you to have and allow stand-alone script arguments. 
+Script arguments are indexed properly, in the order they were received.  They are set to an array `arguments` of the Optopus\Options object.  This allows you to have and script arguments that aren't attached to any options. 
 
 ### Smart Help
 
