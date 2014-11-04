@@ -44,6 +44,11 @@ print_r($options);
 `parse()` must be called *after* all option creation.
 
 ### Public Option Building Methods
+
+This library allows for a lot of flexibility in end-user options usage.  The one thing it does not allow is an option to not have a preceeding "-".  Those are considered script arguments or option arguments (if an option that allows arguments preceeds it).  This is to maintain uniformity, based on (most) common GNU/Linux CLI utilities.
+
+Long options have two dashes and short options have one.  See the clustering section for details on short option clustering (which is of course allowed).
+
 As seen in the example above, there exists method chaining for creating new options.  They are:
 * `add('option')`  - option can be shortopt or longopt, and specifying the dashes is optional.
 
