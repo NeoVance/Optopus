@@ -175,7 +175,7 @@ $options->add('--verbose')
   ->description('Verbosity.  You can amplify by adding again ie: -vvv or -v -v or --verbose --verbose');
 ```
 
-The `count` will be incremented for any option selected in the returned options Object.
+The `count` will be incremented for any option selected in the returned options Object.  You can retrieve it with public `getCount($option)` method, for convenience.  Perhaps you'll want to increase debug level depending on how many times it was specified?  It's up to you.
 
 
 ### End of Options and Help Page
