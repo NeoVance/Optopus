@@ -73,11 +73,17 @@ As seen in the example above, there exists method chaining for creating new opti
 
 * `description($desc_string)` - Set the option description.  This is used in the baked in help.  This should be a brief description.  See public method `help()` also if you wish to override this and make your own help page.
 
+* `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given bu end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
+
+### Public Generic Methods
+
+These are not chained methods. They should be called just before `parse()`.  They set global behavior.  Mostly related to `help()` generation.
+
 * `help($help_string)` - Override the baked in help and set the output string for the help page.
 
 * `title($title_string)` - Override the title.  This is only used in the first line of the help page, and defaults to the actual invoked script name ( `$argv[0]` ).
 
-* `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given bu end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
+
 
 ### Public 'Getters'
 
