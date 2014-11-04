@@ -43,20 +43,22 @@ print_r($options);
 
 `parse()` must be called *after* all option creation.
 
-### Public Option Construction Methods
+### Public Option Building Methods
 As seen in the example above, there exists method chaining for creating new options.  They are:
 * `add('option')`  - option can be shortopt or longopt, and specifying the dashes is optional.
 
-For example:
+  For example:
+```
 
-  `add('f')`
+  add('f')
   
-  `add(-f')`
+  add(-f')
   
-  `add('--foo')`
+  add('--foo')
   
-  `add('foo')`
-  
+  add('foo')
+
+```
 
 * `alias('alias')`  - another name for the option.  You can make the option shortopt, and the alias longopt, vice-versa, or whatever you want.  It's invocation will be equivalent to calling the parent option.
 
@@ -72,9 +74,9 @@ For example:
 
 * `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given bu end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
 
-### Public methods for retreiving Options
+### Public 'Getters'
 
-These methods are available for you to see what was selected, how many times it was selected, what arguments were provided, what option arguments were provided, etc..
+These methods are available for you to see what was selected, how many times it was selected, what arguments were provided, what option arguments were provided, etc.  They are what you will use in your script to determine what to do, based on the user-supplied options.
 
 **NOTE:** Some magic is involved here via PHP's magic method `__call()`.  This is only so that you don't have to remember the exact method names to retreive information about the options and what was selected.  For example, `$options->selected()`, `$options->getSelected()`, `$options->sElecTED()` all call `$options->getSelected()`.  See the `__call()` function for more information on what's allowed.
 
