@@ -160,7 +160,6 @@ class Options
 				if(isset($declustered[$key + 1]) && !$this->_isOption("-".$declustered[$key + 1]) || isset($flag)) {
 					$arg = implode('', array_slice($declustered, $key + 1));
 					$arg = !empty($arg) ? $arg : null;
-					//$arg = !empty(implode('', array_slice($declustered, $key + 1))) ? implode('', array_slice($declustered, $key + 1)) : null;
 					if($arg[0] === "=") {
 						$arg = substr($arg, 1);
 					}
