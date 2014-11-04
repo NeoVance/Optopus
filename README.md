@@ -43,7 +43,7 @@ print_r($options);
 
 `parse()` must be called *after* all option creation.
 
-### Public Methods
+### Public Option Construction Methods
 As seen in the example above, there exists method chaining for creating new options.  They are:
 * `add('option')`  - option can be shortopt or longopt, and specifying the dashes is optional.
 
@@ -72,7 +72,9 @@ For example:
 
 * `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given bu end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
 
-Additional Public methods to retreive information about options:
+### Public methods for retreiving Options
+
+These methods are available for you to see what was selected, how many times it was selected, what arguments were provided, what option arguments were provided, etc..
 
 **NOTE:** Some magic is involved here via PHP's magic method `__call()`.  This is only so that you don't have to remember the exact method names to retreive information about the options and what was selected.  For example, `$options->selected()`, `$options->getSelected()`, `$options->sElecTED()` all call `$options->getSelected()`.  See the `__call()` function for more information on what's allowed.
 
@@ -82,7 +84,7 @@ Additional Public methods to retreive information about options:
 
 * `getSelected()` - Returns an array of all selected options.
 
-* `getRepeatCount($option)` - returns an integer of how many times an option has been selected.
+* `getCount($option)` - returns an integer of how many times an option has been selected.
 
 * `getOptArg($option = null)` - returns an array of option arguments indexed by the option name
 
