@@ -83,6 +83,25 @@ These are not chained methods. They should be called just before `parse()`.  The
 
 * `title($title_string)` - Override the title.  This is only used in the first line of the help page, and defaults to the actual invoked script name ( `$argv[0]` ).
 
+For example:
+
+```
+  // override title displayed in help page
+  $options->title('awesome-cli-script -- Does the needful kindly');
+  
+  // override help page entirely
+  $help_page = <<<EOF
+
+        --foo|-f                Set foo.
+
+        --bar|-b                Set bar.
+
+EOF;
+
+  $options->help($help_page);
+  
+```
+
 
 
 ### Public 'Getters'
