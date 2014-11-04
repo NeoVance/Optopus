@@ -42,7 +42,7 @@ $options->add('--yellow')
 	->incompatibleWith(['-x']);
 
 $options->add('--verbose')
-	->alias('-v')
+	->alias('-v');
 
 $options->add('--kablammo')
 	->alias('-k');

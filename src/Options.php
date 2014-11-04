@@ -577,6 +577,9 @@ class Options
 
 		$end_of_options = false;
 		$this->_normalize();
+		if(!isset($this->_normalized)) {
+			return;
+		}
 		foreach($this->_normalized as $key => $token) {
 
 			if($token === "--") {
