@@ -73,7 +73,7 @@ As seen in the example above, there exists method chaining for creating new opti
 
 * `description($desc_string)` - Set the option description.  This is used in the baked in help.  This should be a brief description.  See public method `help()` also if you wish to override this and make your own help page.
 
-* `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given by an end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
+* `incompatibleWith($options)` - Define options that can not be used in tandem.  $options can be a single option or an array of options.  If more than one option is given by an end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
 
 ### Public Generic Methods
 
