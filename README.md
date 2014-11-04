@@ -164,9 +164,9 @@ Supports `--` for end-of-options GNU pseudo-standard
 
 **NOTE:** If help is requested by the end-user, the return status of the script will be 0.  If help is generated because of a conflict of options selection, help will die with a status of 1.
 
-### Arguments
+### Script Arguments
 
-Script arguments are indexed properly, in the order they were received.  They are set to an array `arguments` of the Optopus\Options object.  This allows you to have and script arguments that aren't attached to any options. 
+Script arguments are basically anything else that isn't captured as an option, or an option's argument.  They are indexed properly, in the order they were received.  They are set to an array `arguments` of the Optopus\Options object.  This allows you to allow your script to accept stand-alone arguments in addition to options.
 
 ### Smart Help
 
