@@ -260,18 +260,6 @@ class Options
 		}
 	}
 
-	protected function _repeats($option) {
-
-		if($Option = $this->_getOption($option)) {
-			foreach($Option as $name => $value) {
-				if(isset($this->options[$name]['repeats'])) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	protected function _optionHas($property, $option) {
 		
 		$Option = $this->_getOption($option);
@@ -438,12 +426,6 @@ class Options
 
 		$this->options[$this->_current_option]['accepts_argument'] = true;
 		$this->options[$this->_current_option]['requires_argument'] = true;
-		return $this;
-	}
-
-	public function repeats() {
-
-		$this->options[$this->_current_option]['repeats'] = true;
 		return $this;
 	}
 
