@@ -73,7 +73,7 @@ As seen in the example above, there exists method chaining for creating new opti
 
 * `description($desc_string)` - Set the option description.  This is used in the baked in help.  This should be a brief description.  See public method `help()` also if you wish to override this and make your own help page.
 
-* `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given bu end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
+* `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given by an end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
 
 ### Public Generic Methods
 
@@ -162,6 +162,15 @@ Supports `--` for end-of-options GNU pseudo-standard
 
 `--help` will default to a help page generated from the public `description()` method.  As of now this can be overriden by calling public `help()` method, ie - `$options->help($string)` where `$string` is a full help page string.  This is only useful if you want to add a lot of custom help information for various options.
 
+**NOTE:** If help is requested by the end-user, the return status of the script will be 0.  If help is generated because of a conflict of options selection, help will die with a status of 1.
+
+### Arguments
+
+Script arguments are indexed properly, in the order they were received.  They are set to an array `arguments` of the Optopus object.  This allows you to have and allow stand-alone script arguments. 
+
+### Smart Help
+
+It also has 'smart help' like `git`.  If you misspell an option it will suggest the closest match.
 
 ### Try it:
 
@@ -177,11 +186,7 @@ If you'd like to give it a test run, here's how.  It comes with a script that yo
 
 `chmod u+x script`
 
-It handles arguments in a way that you would expect.  For instance, try the following 'silly' usage:
-
-`./script ARG0 -v -vv --foo=bar ARG1 -f=Foo -b Bar ARG2 --baz Baz --quux=Quux -xyzw Waldo ARG3 -xyzc=Corge -v --verbose -vv --verbose`
-
-You can also try:
+You should try:
 
 `./script --help`
 
@@ -189,11 +194,9 @@ or:
 
 `./script --help [option]`
 
-It also has 'smart help' like `git`.  If you misspell an option it will suggest the closest match.
+And then try various option combinations.
 
-### Script Arguments
-Script arguments are anything that passed through the option filters.  They are kept track of in the `arguments` property and are indexed in the order in which they were received.
 
-To see all usage, the tests are helpful too. @todo tests not passing yet since refactor
+To see all usage, the tests are helpful too. @TODO tests not passing yet since refactor, nnd are not applicable any longer.  Re-do all tests.
 
 
