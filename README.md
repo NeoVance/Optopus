@@ -11,7 +11,7 @@ PHP library for defining and handling command line options for a PHP command lin
 * Allow public methods to override magic / helpers when necessary
 
 ### Why another PHP CLI Options Parser?
-While ConsoleKit and others are awesome, they don't seem to address only options parsing, and handle every type of option common to CLI scripts, like keeping track of option count for verbosity levels, and allowing optional option arguments.
+While ConsoleKit and others are awesome, they don't seem to address only options parsing properly.  Option count should be kept track of so that verbosity/debug options can be built.  Options should also allow for all common usage syntax intuitively.  This means dealing with clustered short options, and option options (both required and optional) properly.  Script arguments (non-options given) should also be properly handled.
 
 ### Usage:
 
