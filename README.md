@@ -140,7 +140,7 @@ $options->add('--verbose')
   ->description('Verbosity.  You can amplify by adding again ie: -vvv or -v -v or --verbose --verbose');
 ```
 
-The `repeat_count` will be set for the option in the returned options Object.
+The `count` will be set for the option in the returned options Object.
 
 
 ### End of Options and Help Page
