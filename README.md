@@ -122,6 +122,8 @@ These methods are available for you to see what was selected, how many times it 
 
 * `getOptArg($option = null)` - returns an array of option arguments indexed by the option name
 
+* `getArguments()` - returns an array of script arguments.  This is anything given to the script that is not an option, or an option argument.
+
 ### Option Arguments:
 
 Option Arguments come in two flavors:
