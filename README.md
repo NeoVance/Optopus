@@ -85,7 +85,7 @@ These are not chained methods. They should be called directly.  They set global 
 
 For example:
 
-```
+```php
   // override title displayed in help page
   $options->title('awesome-cli-script -- Does the needful kindly');
   
