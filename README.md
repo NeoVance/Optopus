@@ -77,7 +77,7 @@ As seen in the example above, there exists method chaining for creating new opti
 
 ### Public Generic Methods
 
-These are not chained methods. They should be called just before `parse()`.  They set global behavior.  Mostly related to `help()` generation.
+These are not chained methods. They should be called directly.  They set global behavior for Optopus, mostly related to `help()` generation.
 
 * `help($help_string)` - Override the baked in help and set the output string for the help page.
 
