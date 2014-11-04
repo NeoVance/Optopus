@@ -73,7 +73,7 @@ As seen in the example above, there exists method chaining for creating new opti
 
 * `description($desc_string)` - Set the option description.  This is used in the baked in help.  This should be a brief description.  See public method `help()` also if you wish to override this and make your own help page.
 
-* `help($help_string)` - Override the baked in help and set the output string for the help page if options are given incorrectly, or otherwise fail the criteria you've set.
+* `help($help_string)` - Override the baked in help and set the output string for the help page.
 
 * `title($title_string)` - Override the title.  This is only used in the first line of the help page, and defaults to the actual invoked script name ( `$argv[0]` ).
 
