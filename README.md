@@ -73,7 +73,7 @@ For example:
 
 * `repeats()` - specifies that the option should keep a count of how many times it's called.  This is useful mostly for --verbose/-v and --debug/-d/-D options typically, but use this however you like.
 
-* `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
+* `incompatibleWith($options)` - $options can be a single option or an array of options.  If an more than one option is given bu end user that are incompatible with eachother, a message will be generated indicating they are incompatible, along with the standard help page.
 
 Additional Public methods to retreive information about options:
 
