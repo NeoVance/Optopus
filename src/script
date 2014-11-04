@@ -43,7 +43,6 @@ $options->add('--yellow')
 
 $options->add('--verbose')
 	->alias('-v')
-	->repeats();
 
 $options->add('--kablammo')
 	->alias('-k');
