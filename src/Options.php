@@ -218,6 +218,7 @@ class Options
 		echo PHP_EOL.$title.PHP_EOL.PHP_EOL;
 
 		if(isset($option)) {
+			$single_option_help = true;
 			if(!$options = $this->_getOption($option)) {
 
 				// it looked like an option but it isn't one
@@ -248,6 +249,9 @@ class Options
 				echo "     ".$description.PHP_EOL.PHP_EOL;
 			}
 			echo PHP_EOL;
+			if(isset($single_option_help)) {
+				echo "More information may be available in the full help page.  Try ".$this->script." --help".PHP_EOL.PHP_EOL;
+			}
 		}
 		die($err_code);
 	}
