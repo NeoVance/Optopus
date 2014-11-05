@@ -121,7 +121,9 @@ class Options
 			foreach($Option as $name => $value) {
 				//$this->options[$name]['selected'] = false;
 				unset($this->options[$name]['selected']);
-				$this->options[$name]['count'] -= 1;
+				if(isset($this->options[$name]['count'])) {
+					$this->options[$name]['count'] -= 1;
+				}
 			}
 		}
 	}
@@ -253,7 +255,11 @@ class Options
 				echo "More information may be available in the full help page.  Try ".$this->script." --help".PHP_EOL.PHP_EOL;
 			}
 		}
-		die($err_code);
+		if(defined('UNIT_TESTING')) {
+			return "Dying with $err_code";
+		} else {
+			die($err_code);
+		}
 	}
 
 	protected function _setOptArg($option, $arg) {

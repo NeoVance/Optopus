@@ -8,216 +8,145 @@ use Optopus\Options;
 
 class OptionsTest extends \PHPUnit_Framework_TestCase {
 
-	public function testAddOption() {
+	public function testGet() {
 
 		$argv = [ 'script-name' ];
-		$options = new Options($argv);
+		$Options = new Options($argv);
 
-		$options->add('-x');
-		$options->parse();
-		$this->assertNotFalse($options->get('-x'));
+		$Options->add('--foo');
+		$Options->parse();
+		$option = $Options->get('--foo');
+		$this->assertArrayHasKey('--foo', $option);
+	}
+
+	public function testAdd() {
+
+		// same as above but it doesn't matter
+		$argv = [ 'script-name' ];
+		$Options = new Options($argv);
+
+		$Options->add('--foo');
+		$Options->parse();
+		$option = $Options->get('--foo');
+		$this->assertArrayHasKey('--foo', $option);
 	}
 	
-	public function testAddAlias() {
+	public function testAlias() {
 
 		$argv = [ 'script-name' ];
-		$options = new Options($argv);
+		$Options = new Options($argv);
 
-		$options->add('-x')
-			->alias('-X');
-		$options->parse();
-		$this->assertNotFalse($options->getAlias('-X'));
-	}
-	
-	public function testRequired() {
-
-		$argv = [ 'script-name' ];
-		$options = new Options($argv);
-
-		$options->add('-x')
-			->required();
-		$options->parse();
-		$option = $options->get('-x');
-		$this->assertNotFalse($option['-x']['required']);
+		$Options->add('--foo')
+			->alias('-f');
+		$Options->parse();
+		$option = $Options->get('-f');
+		$this->assertArrayHasKey('--foo', $option);
+		$this->assertEquals('-f', $option['--foo']['aliases'][0]);
 	}
 
 	public function testAcceptsArgument() {
-		
+
 		$argv = [ 'script-name' ];
-		$options = new Options($argv);
+		$Options = new Options($argv);
 
-		$options->add('-x')
+		$Options->add('--foo')
 			->acceptsArgument();
-		$options->parse();
-		$option = $options->get('-x');
-		$this->assertNotFalse($option['-x']['accepts_argument']);
+		$Options->parse();
+		$option = $Options->get('--foo');
+		$this->assertTrue($option['--foo']['accepts_argument']);
+	}
 
+	public function testRequiresArgument() {
+
+		$argv = [ 'script-name' ];
+		$Options = new Options($argv);
+
+		$Options->add('--foo')
+			->requiresArgument();
+		$Options->parse();
+		$option = $Options->get('--foo');
+		$this->assertTrue($option['--foo']['accepts_argument']);
+		$this->assertTrue($option['--foo']['requires_argument']);
+	}
+
+	public function testDescription() {
+
+		$argv = [ 'script-name' ];
+		$Options = new Options($argv);
+
+		$Options->add('--foo')
+			->description('my description');
+		$Options->parse();
+		$option = $Options->get('--foo');
+		$this->assertEquals('my description', $option['--foo']['description']);
+		
+	}
+
+	public function testTitle() {
+
+		$argv = [ 'script-name' ];
+		$Options = new Options($argv);
+
+		$Options->add('--foo');
+		$Options->title('my title');
+		$Options->parse();
+		$this->assertEquals('my title', $Options->title);
 	}
 	
-	public function testAcceptsRequiresArgument() {
+	public function testEndOfOptions() {
+
+		// "--foo" should be treated as an argument, NOT parsed as an option
+		$argv = [ 'script-name', '--', '--foo'];
+		$Options = new Options($argv);
+
+		$Options->add('--foo');
+		$Options->parse();
+		$this->assertEquals('--foo', $Options->arguments[0]);
+
+		// end-of-options should NOT be honored here because --foo requiresArgument
+		// it should be captured as the argument to option --foo instead
+		$argv = [ 'script-name', '--foo', '--'];
+		$Options = new Options($argv);
+
+		$Options->add('--foo')
+			->requiresArgument();
+		$Options->parse();
 		
-		$argv = [ 'script-name' ];
-		$options = new Options($argv);
+		$eooOption = $Options->get('--');	
+		$this->assertArrayNotHasKey('selected', $eooOption['--']);
+		
+		$fooOption = $Options->get('--foo');
+		$this->assertEquals('--', $fooOption['--foo']['arg']);
 
-		$options->add('-x')
-			->acceptsArgument('required');
-		$options->parse();
-		$option = $options->get('-x');
-		$this->assertNotFalse($option['-x']['accepts_argument']);
-		$this->assertNotFalse($option['-x']['requires_argument']);
+		// end-of-options should be honored if the option merely acceptsArgument
 
+		$argv = [ 'script-name', '--foo', '--'];
+		$Options = new Options($argv);
+
+		$Options->add('--foo')
+			->acceptsArgument();
+		$Options->parse();
+		
+		$eooOption = $Options->get('--');	
+		$this->assertArrayHasKey('selected', $eooOption['--']);
+		
+		$fooOption = $Options->get('--foo');
+		$this->assertArrayNotHasKey('arg', $fooOption['--foo']);
+
+		// end-of-options should be honored even if --help is given
+
+		$argv = [ 'script-name', '--', '--help'];
+		$Options = new Options($argv);
+
+		$Options->parse();
+		
+		$eooOption = $Options->get('--');	
+		$this->assertArrayHasKey('selected', $eooOption['--']);
+		
+		$helpOption = $Options->get('--help');
+		$this->assertArrayNotHasKey('selected', $helpOption['--help']);
+		
 	}
-
-	public function testRepeats() {
-
-		// called once
-		$argv = [ 'script-name', '-v' ];
-		$options = new Options($argv);
-
-		$options->add('--verbose')
-			->alias('-v')
-			->repeats();
-		$options->parse();
-		$option = $options->get('--verbose');
-		$this->assertNotFalse($option['--verbose']['repeats']);
-		$this->assertEquals(1, $option['--verbose']['repeat_count']);
-
-		// called twice
-		$argv = [ 'script-name', '-vv' ];
-		$options = new Options($argv);
-
-		$options->add('--verbose')
-			->alias('-v')
-			->repeats();
-		$options->parse();
-		$option = $options->get('-v');
-		$this->assertNotFalse($option['--verbose']['repeats']);
-		$this->assertEquals(2, $option['--verbose']['repeat_count']);
-		
-		// called with long and short
-		$argv = [ 'script-name', '-v', '--verbose' ];
-		$options = new Options($argv);
-
-		$options->add('--verbose')
-			->alias('-v')
-			->repeats();
-		$options->parse();
-		$option = $options->get('-v');
-		$this->assertNotFalse($option['--verbose']['repeats']);
-		$this->assertEquals(2, $option['--verbose']['repeat_count']);
-
-		// called with long and short and other options and script args mixed in
-		$argv = [ 'script-name', '-a', 'ARG0', '-v', '-s', '--verbose', 'ARG1', '-d', 'ARG2' ];
-		$options = new Options($argv);
-
-		$options->add('--verbose')
-			->alias('-v')
-			->repeats();
-		$options->parse();
-		$option = $options->get('-v');
-		$this->assertNotFalse($option['--verbose']['repeats']);
-		$this->assertEquals(2, $option['--verbose']['repeat_count']);
-	}
-
-	public function testCluster() {
-	
-		// simple cluster	
-		$argv = [ 'script-name', '-asdf' ];
-		$options = new Options($argv);
-
-		$options->add('-a');
-		$options->add('-s');
-		$options->add('-f');
-		$options->add('-d');
-		$options->parse();
-
-		$myopts = $options->get();
-
-		$given = [ '-a', '-s', '-d', '-f' ];
-		foreach($given as $opt) {
-			$this->assertArrayHasKey($opt, $myopts);
-		}
-
-		// test f=Foo; f accepts argument
-		$argv = [ 'script-name', '-asdf=Foo' ];
-		$options = new Options($argv);
-
-		$options->add('-a');
-		$options->add('-s');
-		$options->add('-f')
-			->acceptsArgument();
-		$options->add('-d');
-		$options->parse();
-
-		$myopts = $options->get();
-
-		// make sure all arguments are present
-		$given = [ '-a', '-s', '-d', '-f' ];
-		foreach($given as $opt) {
-			$this->assertArrayHasKey($opt, $myopts);
-		}
-
-		$this->assertEquals($myopts['-f']['argument'], 'Foo');
-		
-		// test fFoo; f accepts argument
-		$argv = [ 'script-name', '-asdfFoo' ];
-		$options = new Options($argv);
-
-		$options->add('-a');
-		$options->add('-s');
-		$options->add('-f')
-			->acceptsArgument();
-		$options->add('-d');
-		$options->parse();
-
-		$myopts = $options->get();
-
-		// make sure all arguments are present
-		$given = [ '-a', '-s', '-d', '-f' ];
-		foreach($given as $opt) {
-			$this->assertArrayHasKey($opt, $myopts);
-		}
-
-		$this->assertEquals($myopts['-f']['argument'], 'Foo');
-		
-		// test -s accepts argument, should take everything after -s, which is "Soodf"
-		$argv = [ 'script-name', '-asSoodf' ];
-		$options = new Options($argv);
-
-		$options->add('-a');
-		$options->add('-s')
-			->acceptsArgument();
-		$options->add('-f');
-		$options->add('-d');
-		$options->parse();
-
-		$myopts = $options->get();
-
-		$this->assertEquals($myopts['-s']['argument'], 'Soodf');
-
-		// test -s accepts argument with s= syntax, should take everything after -s, which is "Soodf"
-		$argv = [ 'script-name', '-as=Soodf' ];
-		$options = new Options($argv);
-
-		$options->add('-a');
-		$options->add('-s')
-			->acceptsArgument();
-		$options->add('-f');
-		$options->add('-d');
-		$options->parse();
-
-		$myopts = $options->get();
-
-		// make sure all arguments are present
-		$given = [ '-a', '-s', '-d', '-f' ];
-		foreach($given as $opt) {
-			$this->assertArrayHasKey($opt, $myopts);
-		}
-
-		$this->assertEquals($myopts['-s']['argument'], 'Soodf');
-
-	}
-
 }
 
 ?>
