@@ -313,7 +313,7 @@ class Options
 		$end_of_options = false;
 		foreach($this->given as $key => $token) {
 
-			if($token === "--help") {
+			if($token === "--help" && !$end_of_options) {
 				if(isset($this->given[$key + 1])) {
 					$with = $this->given[$key + 1];
 					$this->_help($with, 0);
