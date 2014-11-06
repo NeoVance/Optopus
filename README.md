@@ -79,7 +79,7 @@ As seen in the example above, there exists method chaining for creating new opti
 
 These are not chained methods. They should be called directly.  They set global behavior for Optopus, mostly related to `help()` generation.
 
-* `help($help_string)` - Override the baked in help and set the output string for the help page.
+* `overrideHelp($help_string)` - Override the baked in help and set the output string for the help page.
 
 * `title($title_string)` - Override the title.  This is only used in the first line of the help page, and defaults to the actual invoked script name ( `$argv[0]` ).
 
@@ -98,7 +98,7 @@ For example:
 
 EOF;
 
-  $options->help($help_page);
+  $options->overrideHelp($help_page);
   
 ```
 
@@ -123,6 +123,8 @@ These methods are available for you to see what was selected, how many times it 
 * `getOptArg($option = null)` - returns an array of option arguments indexed by the option name
 
 * `getArguments()` - returns an array of script arguments.  This is anything given to the script that is not an option, or an option argument.
+
+* `help($option = null, $err_code = 0)` - Triggers the help page at any time.  This causes a die($err_code) as the help page generation always does.
 
 ### Option Arguments:
 
