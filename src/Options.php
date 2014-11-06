@@ -447,7 +447,7 @@ class Options
 		return $this;
 	}
 
-	public function help($help) {
+	public function overrideHelp($help) {
 
 		if(isset($help)) {
 			$this->help = $help;
@@ -563,6 +563,12 @@ class Options
 		return $arguments;
 	}
 
+	public function help($option = null, $err_code = 0) {
+
+		// this is to trigger help manually at any time
+		$this->_help($option, $err_code);	
+	}
+
 	// Some magic for 'fuzzy calling' public getter methods
 	// ie: getCount() 
 
@@ -579,8 +585,11 @@ class Options
 		if(preg_match('/selected/i', $name)) {
 			return $this->getSelected();
 		}
-		if(preg_match('/(args|arguments)/i', $name)) {
+		if(preg_match('/(getargs|arguments)/i', $name)) {
 			return $this->getArguments();
+		}
+		if(preg_match('/(trigger|call|show|display)_?[hH]elp)/i', $name)) {
+			return $this->help();
 		}
 	}
 
