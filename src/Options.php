@@ -588,7 +588,7 @@ class Options
 		if(preg_match('/(getargs|arguments)/i', $name)) {
 			return $this->getArguments();
 		}
-		if(preg_match('/(trigger|call|show|display)_?[hH]elp)/i', $name)) {
+		if(preg_match('/(trigger|call|show|display)_?[hH]elp/i', $name)) {
 			return $this->help();
 		}
 	}
