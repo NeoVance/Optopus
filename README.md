@@ -189,7 +189,7 @@ Supports `--` for end-of-options GNU pseudo-standard
 
 ### Script Arguments
 
-Script arguments are basically anything else that isn't captured as an option, or an option's argument.  They are indexed properly, in the order they were received.  They are set to an array `arguments` of the Optopus\Options object.  This permits your script to accept stand-alone arguments in addition to options.
+Script arguments are basically anything else that isn't captured as an option, or an option's argument.  They are indexed properly, in the order they were received.  They are set to an array `arguments` of the Optopus\Options object.  This permits your script to accept stand-alone arguments in addition to options and options' arguments.
 
 For example:  `./script ARG0 --foo=Foo ARG1 -x -y ARG2`
 
