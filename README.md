@@ -195,7 +195,7 @@ For example:  `./script ARG0 --foo=Foo ARG1 -x -y ARG2`
 
 ### Smart Help
 
-It also has 'smart help' like `git`.  If you misspell an option it will suggest the closest match.
+It also has 'smart help' like `git`.  If an end-user misspells an option it will suggest the closest match.
 
 ### Try it:
 
