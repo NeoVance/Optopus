@@ -104,7 +104,7 @@ EOF;
 
 
 
-### Public 'Getters'
+### Public 'Accessors/Getters'
 
 These methods are available for you to see what was selected, how many times it was selected, what arguments were provided, what option arguments were provided, etc.  They are what you will use in your script to determine what to do, based on the user-supplied options.
 
