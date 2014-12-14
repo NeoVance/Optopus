@@ -222,6 +222,6 @@ or:
 And then try various option combinations.
 
 
-To see all usage, the tests are helpful too. @TODO tests not passing yet since refactor, nnd are not applicable any longer.  Re-do all tests.
+To see all usage, the tests are helpful too. @TODO need more tests
 
 
