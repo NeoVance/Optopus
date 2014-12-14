@@ -31,8 +31,7 @@ $options->add('--waldo')
 
 $options->add('--corge')
 	->alias('-c')
-	->acceptsArgument()
-	->required();
+	->acceptsArgument();
 
 $options->add('--xray')
 	->alias('-x');
@@ -50,5 +49,6 @@ $options->add('--kablammo')
 $options->title("./foobar -- Does some things");
 $options->parse();
 
-print_r($options);
+var_dump($options->getArguments());
+//print_r($options);
 

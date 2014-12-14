@@ -107,7 +107,6 @@ class Options
 				$this->options[$name]['selected'] = true;
 				if(isset($this->options[$name]['count'])) {
 					$this->options[$name]['count'] += 1;
-					echo "  and we just incremented count, so it's now ".$this->options[$name]['count']."\n";
 				} else {
 					$this->options[$name]['count'] = 1;
 				}
