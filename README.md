@@ -158,15 +158,15 @@ Also note that if any option in a cluster `requiresArgument()` anything after it
 
 `./script -abcrdefFoo`
 
-Will produce an arg of `defFoo` for `-r` (regardless of whether anything after is a valid option)
+Will produce an option argument of `defFoo` for `-r` (regardless of whether anything after is a valid option)
 
 `./script -rabc`
 
-Will produce an arg of `abc` for `-r`
+Will produce an option argument of `abc` for `-r`
 
 `./script -abcr=Foo`
 
-Will produce an arg of `Foo` for `-r`
+Will produce an option argument of `Foo` for `-r`
 
 ### Repeating Options
 Useful mostly for debug / verbosity options, for example:
