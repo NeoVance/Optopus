@@ -306,7 +306,9 @@ class Options
      * Determines if an option string is prohibited.
      *
      * An option may not literally contain '='.
-     * An option may not literally contain '-'.
+     * An option may not be literally '-'.
+     * @todo - Many GNU Core utilities allow '-' to signify STDIN
+     *   Should we allow that?
      *
      * @param string $option The option string to check.
      * @return bool
