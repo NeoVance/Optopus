@@ -603,7 +603,7 @@ class Options
         $option = isset($option) ? $this->_addDashes($option) : null;
 
         if ($this->_prohibited($option)) {
-            throw new Exception("Attmepted to add prohibited option $option");
+            throw new \Exception("Attmepted to add prohibited option $option");
          // @todo friendlier error handling here
         }
 
