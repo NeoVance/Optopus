@@ -182,6 +182,7 @@ The `count` will be incremented for any option selected in the returned options 
 
 ### End of Options, STDIN option, and Help Page
 Supports `--` for end-of-options GNU pseudo-standard
+
 Allows `-` as a valid option.  This is another GNU pseudo-standard, and *usually* used to parse STDIN.  This is why it's allowed.  To stay in compliance with GNU core utilities, and most CLI utilities, you should only use this option for capturing STDIN.  If you're unclear on this, `man cat` -- see EXAMPLES section.
 
 `--help` will default to a help page generated from the public `description()` methods for various options.  As of now this can be overriden by calling public `help()` method, ie - `$options->help($string)` where `$string` is a full help page string.  This is only useful if you want to add a lot of custom help information for various options.
