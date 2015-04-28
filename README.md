@@ -180,12 +180,13 @@ $options->add('--verbose')
 The `count` will be incremented for any option selected in the returned options Object.  You can retrieve it with public `getCount($option)` method, for convenience.  Perhaps you'll want to increase debug level depending on how many times it was specified?  It's up to you.
 
 
-### End of Options and Help Page
+### End of Options, STDIN option, and Help Page
 Supports `--` for end-of-options GNU pseudo-standard
+Allows `-` as a valid option.  This is another GNU pseudo-standard, and *usually* used to parse STDIN.  This is why it's allowed.  To stay in compliance with GNU core utilities, and most CLI utilities, you should only use this option for capturing STDIN.  If you're unclear on this, `man cat` -- see EXAMPLES section.
 
-`--help` will default to a help page generated from the public `description()` method.  As of now this can be overriden by calling public `help()` method, ie - `$options->help($string)` where `$string` is a full help page string.  This is only useful if you want to add a lot of custom help information for various options.
+`--help` will default to a help page generated from the public `description()` methods for various options.  As of now this can be overriden by calling public `help()` method, ie - `$options->help($string)` where `$string` is a full help page string.  This is only useful if you want to add a lot of custom help information for various options.
 
-**NOTE:** If help is requested by the end-user, the return status of the script will be 0.  If help is generated because of a conflict of options selection, help will die with a status of 1.
+**NOTE:** If help is requested by the end-user, the return status of the script will be 0.  If help is generated because of a conflict of options selection, help will die with a status of 1.  If you run the `help()` method, you can optionally pass a 2nd argument of the specific exit status, as stated above in that section.
 
 ### Script Arguments
 
