@@ -46,7 +46,7 @@ class Options
      */
     protected function _isCluster($token)
     {
-        if ($token[0] == "-" && $token[1] !== "-" && strlen($token) > 2) {
+        if ($token[0] === "-" && isset($token[1]) && $token[1] !== "-" && strlen($token) > 2) {
             return true;
         }
         return false;
@@ -144,10 +144,15 @@ class Options
      */
     protected function _looksLikeLongOpt($token)
     {
-
-     // if token[2] is not set, then this is actually end-of-options "--"
-        if ($token[0] === "-" && $token[1] === "-" && isset($token[2])) {
-            return true;
+        if ($token[0] === "-") {
+            if (strlen($token) === 1) {
+                // STDIN option '-'
+                return false;
+            }
+            /* if token[2] is not set, then this is actually end-of-options "--" */
+            if ($token[1] === "-" && isset($token[2])) {
+                return true;
+            }
         }
         return false;
     }
@@ -315,7 +320,8 @@ class Options
      */
     private function _prohibited($option)
     {
-        if (strstr($option, "=") || $option === "-") {
+        //if (strstr($option, "=") || $option === "-") {
+        if (strstr($option, "=")) {
             return true;
         }
         return false;
