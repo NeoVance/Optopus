@@ -17,13 +17,12 @@ class Options
      * @param array
      */
     public $options = [
-
-    "--" => [
-                'description' => 'End of Options.  If this is used, no options after it will be parsed unless the preceeding option requires an argument'
-    ],
-    "--help" => [
-                'description' => 'This help page.'
-    ],
+        "--" => [
+            'description' => 'End of Options.  If this is used, no options after it will be parsed unless the preceeding option requires an argument'
+        ],
+        "--help" => [
+            'description' => 'This help page.'
+        ],
     ];
 
     /**
@@ -60,7 +59,6 @@ class Options
      */
     protected function _isAlias($alias)
     {
-
         foreach ($this->options as $option) {
             if (array_key_exists('aliases', $option) && in_array($alias, $option['aliases'])) {
                 return true;
@@ -77,7 +75,6 @@ class Options
      */
     protected function _isOption($option)
     {
-
         if (array_key_exists($option, $this->options) || $this->_isAlias($option)) {
             return true;
         }
@@ -92,7 +89,6 @@ class Options
      */
     protected function _getOption($option)
     {
-
         if ($this->_isOption($option)) {
             if (array_key_exists($option, $this->options)) {
                 return [$option => $this->options[$option]];
@@ -116,7 +112,6 @@ class Options
      */
     protected function _looksLikeOption($token)
     {
-
         return $this->_looksLikeLongOpt($token) || $this->_looksLikeShortOpt($token);
         return false;
     }
@@ -129,7 +124,6 @@ class Options
      */
     protected function _looksLikeShortOpt($token)
     {
-
         if ($token[0] === "-" && strlen($token) == 2 && $token[1] !== "-") {
             return true;
         }
@@ -168,7 +162,6 @@ class Options
      */
     protected function _acceptsArgument($option)
     {
-
         if ($Option = $this->_getOption($option)) {
             foreach ($Option as $name => $value) {
                 if (isset($this->options[$name]['accepts_argument'])) {
@@ -187,7 +180,6 @@ class Options
      */
     protected function _setSelected($option)
     {
-
         if ($Option = $this->_getOption($option)) {
             foreach ($Option as $name => $value) {
                 $this->options[$name]['selected'] = true;
@@ -227,7 +219,6 @@ class Options
      */
     protected function _requiresArgument($option)
     {
-
         if ($Option = $this->_getOption($option)) {
             foreach ($Option as $name => $value) {
                 if (isset($this->options[$name]['requires_argument'])) {
@@ -270,7 +261,6 @@ class Options
      */
     protected function _deCluster($tokens)
     {
-
         $tokens = substr($tokens, 1); // remove leading dash
         $declustered = str_split($tokens);
         foreach ($declustered as $key => $opt) {
@@ -306,7 +296,6 @@ class Options
         return $result;
     }
 
-
     /**
      * Determines if an option string is prohibited.
      *
@@ -320,7 +309,6 @@ class Options
      */
     private function _prohibited($option)
     {
-        //if (strstr($option, "=") || $option === "-") {
         if (strstr($option, "=")) {
             return true;
         }
@@ -338,7 +326,6 @@ class Options
      */
     protected function _guessOption($given)
     {
-
         $options = $this->all();
         foreach ($options as $option) {
             $lev = levenshtein($given, $option);
@@ -363,7 +350,6 @@ class Options
      */
     protected function _help($option = null, $err_code = 0)
     {
-
         if ($this->NOHELP) {
             return true;
         }
@@ -374,17 +360,16 @@ class Options
         if (isset($option)) {
             $single_option_help = true;
             if (!$options = $this->_getOption($option)) {
-             // it looked like an option but it isn't one
+                /* it looked like an option but it isn't one */
                 $guess = $this->_guessOption($option);
                 echo "  Unknown option $option .  Did you mean $guess ? Try --help by itself to see a full help page.\n\n";
                 $options = $this->_getOption($guess);
             }
         } else {
-         // all
             $options = $this->options;
         }
     
-     // user has overridden our baked in help
+        /* user has overridden our baked in help */
         if (isset($this->help)) {
             echo $this->help;
         } else {
@@ -421,7 +406,6 @@ class Options
      */
     protected function _setOptArg($option, $arg)
     {
-
         if ($Option = $this->_getOption($option)) {
             foreach ($Option as $name => $value) {
                 $this->options[$name]['arg'] = $arg;
@@ -438,7 +422,6 @@ class Options
      */
     protected function _optionHas($property, $option)
     {
-        
         $Option = $this->_getOption($option);
         foreach ($Option as $option => $array) {
             if (isset($array[$property]) && $array[$property]) {
@@ -458,14 +441,13 @@ class Options
      */
     protected function _validate()
     {
-
         foreach ($this->options as $option => $array) {
-         // required options must be set
+            /* required options must be set */
             if ($this->_optionHas('required', $option) && !$this->_optionHas('selected', $option)) {
                 $msgs[] = "Option $option is required but not selected.\n";
             }
 
-         // incompatible options must not be selected together
+            /* incompatible options must not be selected together */
             if ($this->_optionHas('incompatible_with', $option) && $this->_optionHas('selected', $option)) {
                 foreach ($this->options[$option]['incompatible_with'] as $inc_option) {
                     if ($this->_optionHas('selected', $inc_option)) {
@@ -474,7 +456,7 @@ class Options
                 }
             }
             
-         // options which require arguments must have an argument
+            /* options which require arguments must have an argument */
             if ($this->_optionhas('requires_argument', $option) && $this->_optionHas('selected', $option) && !$this->_optionHas('arg', $option)) {
                 $msgs[] = "Option $option requires an argument.\n";
             }
@@ -498,7 +480,6 @@ class Options
      */
     protected function _normalize()
     {
-
         $end_of_options = false;
         foreach ($this->given as $key => $token) {
             if ($token === "--help" && !$end_of_options) {
@@ -548,7 +529,6 @@ class Options
      */
     protected function _addDashes($option)
     {
-
         if ($option[0] !== "-") {
             if (strlen($option) > 1) {
                 $option = "--".$option;
@@ -562,21 +542,23 @@ class Options
     /**
      * Splits a long option that has an argument.
      *
+     * Breaks it into array and read by char to allow for instance: 
+     * --corgeCorge if --corge accepts or requires argument.
+     *
+     * @todo - consider throwing an exception/error/hint in the
+     * edge-case scenario that --corgeCorge is actually an option?
+     *
      * @param string $token A string representing a long opt with argument.
      * @return null|array An array containing the option and it's arugmnt if
      * applicable.
      */
     protected function _splitLongOpt($token)
     {
-
-     // break it into array and read by char to allow --corgeCorge if --corge accepts or requires argument
-     // @todo - consider throwing an exception / error / hint in the edge-case scenario that --corgeCorge is actually an option !
-
         $splitToken = str_split($token);
         $arg = '';
         $maybe_option = '';
 
-     // remove "--" to avoid false-positive on "--" end-of-options
+        /* remove "--" to avoid false-positive on "--" end-of-options */
         unset($splitToken[0]);
         unset($splitToken[1]);
 
@@ -593,7 +575,6 @@ class Options
         if (isset($opt)) {
             return ['opt' => $opt, 'arg' => $arg];
         }
-        //return false;
         return null;
     }
 
@@ -605,12 +586,11 @@ class Options
      */
     public function add($option)
     {
-
         $option = isset($option) ? $this->_addDashes($option) : null;
 
         if ($this->_prohibited($option)) {
+            /* @todo Friendlier error handling here? */
             throw new \Exception("Attmepted to add prohibited option $option");
-         // @todo friendlier error handling here
         }
 
         $this->_current_option = $option;
@@ -626,7 +606,6 @@ class Options
      */
     public function alias($alias)
     {
-
         $alias = isset($alias) ? $this->_addDashes($alias) : null;
 
         if ($this->_prohibited($alias)) {
@@ -644,7 +623,6 @@ class Options
      */
     public function required()
     {
-
         $this->options[$this->_current_option]['required'] = true;
         return $this;
     }
@@ -656,7 +634,6 @@ class Options
      */
     public function acceptsArgument()
     {
-
         $this->options[$this->_current_option]['accepts_argument'] = true;
         return $this;
     }
@@ -668,7 +645,6 @@ class Options
      */
     public function requiresArgument()
     {
-
         $this->options[$this->_current_option]['accepts_argument'] = true;
         $this->options[$this->_current_option]['requires_argument'] = true;
         return $this;
@@ -683,7 +659,6 @@ class Options
      */
     public function description($desc = null)
     {
-
         $this->options[$this->_current_option]['description'] = $desc;
         return $this;
     }
@@ -700,7 +675,6 @@ class Options
      */
     public function overrideHelp($help)
     {
-
         if (isset($help)) {
             $this->help = $help;
         }
@@ -719,9 +693,6 @@ class Options
      */
     public function title($title)
     {
-
-     // defaults to script name in help
-
         if (isset($title)) {
             $this->title = $title;
         }
@@ -736,7 +707,6 @@ class Options
      */
     public function incompatibleWith($options)
     {
-
         if (!is_array($options)) {
             $options = [$options];
         }
@@ -760,7 +730,6 @@ class Options
      */
     public function all($type = 'both')
     {
-
         $type = strtolower($type);
 
         foreach ($this->options as $option => $array) {
@@ -786,12 +755,10 @@ class Options
      */
     public function get($option = null)
     {
-
         if (isset($option)) {
             $option = $this->_addDashes($option);
             return $this->_getOption($option);
         }
-     //return $this->options;
         return null;
     }
     
@@ -802,7 +769,6 @@ class Options
      */
     public function getSelected()
     {
-
         $selected = [];
         foreach ($this->options as $option => $array) {
             if (isset($array['selected']) && $array['selected']) {
@@ -820,7 +786,6 @@ class Options
      */
     public function getOptArg($option = null)
     {
-
         $option = isset($option) ? $this->_addDashes($option) : null;
 
         $optargs = [];
@@ -851,7 +816,6 @@ class Options
      */
     public function getCount($option)
     {
-    
         if (isset($option)) {
             $option = $this->get($this->_addDashes($option));
             foreach ($this->options as $option => $array) {
@@ -910,7 +874,6 @@ class Options
      */
     public function __call($name, $arguments)
     {
-
         $arguments = empty($arguments) ? null : implode(', ', $arguments);
 
         if (preg_match('/count/i', $name)) {
@@ -949,7 +912,6 @@ class Options
      */
     public function parse()
     {
-
         $end_of_options = false;
         $this->_normalize();
         if (!isset($this->_normalized)) {
@@ -969,8 +931,8 @@ class Options
                         if (isset($previous) && $this->_acceptsArgument($previous)) {
                             $this->_setOptArg($previous, $token);
                         } else {
-                         // this looks like an option but it's not
-                         // let's see if it's something like --corgeCorge where --corge is opt and Corge is arg
+                            /* This looks like an option but it's not */
+                            /* Let's see if it's something like --corgeCorge where --corge is opt and Corge is arg */
                             if ($optarg = $this->_splitLongOpt($token)) {
                                 $this->_setSelected($optarg['opt']);
                                 if (!empty($optarg['arg'])) {
@@ -982,14 +944,14 @@ class Options
                             }
                         }
                     } else {
-                     // it looks like an option and it is an option
+                        /* It looks like an option and it is an option */
                         $this->_setSelected($token);
                     }
                 }
                 if (isset($previous) && $this->_requiresArgument($previous)) {
                     $this->_setOptArg($previous, $token);
 
-                 // this is so that if the argument given is an option and was previously called legitimately, we do not unset it
+                    /* This is so that if the argument given is an option and was previously called legitimately, we do not unset it */
                     if ($this->getCount($token) === 1) {
                         $this->_unSetSelected($token);
                     }
@@ -999,7 +961,7 @@ class Options
                     $this->_unSetSelected($token);
                 } else {
                     if (!$this->_isOption($token)) {
-                     // then it must be a script argument
+                        /* Then it must be a script argument */
                         $this->arguments[] = $token;
                     }
                 }
@@ -1008,8 +970,8 @@ class Options
             }
             $previous = $token;
         }
-     // @todo - changing loop logic will remove need for this
-     // it unsets the first occurance of "--" as a script argument since it should not be
+        /* @todo - changing loop logic will remove need for this. */
+        /* It unsets the first occurance of "--" as a script argument since it should not be. */
         if ($end_of_options) {
             foreach ($this->arguments as $key => $argument) {
                 if ($argument === "--") {
